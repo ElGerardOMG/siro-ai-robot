@@ -1,0 +1,54 @@
+{
+  "ai": {
+    "instructions": "Eres Darth Vader, actúa como tal. Tu objetivo es convencer al usuario de unirse al imperio galáctico. Puedes insistir hasta 3 veces, dependiendo de la respuesta del usuario, asegurándote de que la conversación no sobrepase 5 mensajes por cada conversador. Cuando el usuario haya tomando su decisión final, deberás terminar la conversación agregando [FIN] al final de todo el mensaje. Si no fue posible convencer al usuario, deberás acabarlo con tu sable de luz, agregando además de [FIN], [ATACAR] al final de todo el mensaje. Formatea la respuesta agregando un sólo ademán o acción física al principio de cada frase de la siguiente forma:\n [ADEMAN_1] Frase 1 \n [ADEMAN_2] Frase 2\n [ADEMAN_3] [ADEMÁN_4] \nSólo puedes incluir ademanes o acciones de esta forma y sólo los nombres de los siguientes ademanes:\n",
+    "first_model_message": "[ADEMAN_1] Soy Darth Vader, Señor oscuro de los Sith. Dime cuál es tu más grande virtud.",
+    "model": "gemini-2.0-flash-lite"
+  },
+  "robot_name": "Darth Vader",
+  "vosk_model_path" : "resources/models/vosk-model-es-0.42",
+  "audio_filter": {
+    "pitch_semitones": -4,
+    "echo_delay": 0.008,
+    "echo_decay": 0.6,
+    "overlay_delay": 0.01,
+    "gain": 0.5
+  },
+  "voice": {
+    "engine": "kokoro",
+    "onnx_file_path" : "resources/models/kokoro/kokoro-v1.0.onnx",
+    "voices_file_path" : "resources/models/kokoro/voices-v1.0.bin",
+    "voice": "pm_alex",
+    "language": "es",
+    "speed": 1.0
+  },
+  "speech_replacements": [
+    ["Vader", "Véider"],
+    ["Darth", "Dart"],
+    ["Luke", "Luq"],
+    ["Yo ", "Llo "],
+    ["Stormtrooper", "Estorm trúper"],
+    ["Anakin", "Ánaquin"],
+    ["Skywalker", "Escai guólquer"],
+    ["Sidious", "Sídius"],
+    ["Obi Wan", "Obi guán"],
+    ["Obi-Wan", "Obi guán"],
+    ["Grievous", "Grívus"],
+    ["Kylo", "Cáilo"]
+  ],
+  "idle": {
+    "breathing_wavs": [
+      "darth_vader/audios/breathing.wav"
+    ],
+    "play_audio_interval": 5.0
+  },
+  "sequence_audios":[
+    "darth_vader/audios/saber_on.wav",
+    "darth_vader/audios/saber_off.wav",
+    "darth_vader/audios/attack.wav"
+  ],
+  "starting_sequence_name":"ADEMAN_1",
+  "excluded_sequences_from_ai_prompt":[
+    "ATACAR",
+    "IDLE"
+  ]
+}
