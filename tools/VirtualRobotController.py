@@ -27,6 +27,9 @@ class VirtualRobotController(AComponentController):
         servo_name: String (ej. 'NECK_X')
         angle: Float (grados)
         """
+        if value is None:
+            return
+            
         self._values[component.channel] = value
 
         payload = {

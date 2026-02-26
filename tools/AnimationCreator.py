@@ -399,8 +399,10 @@ def change_selected_component(newSelectedComponent : int):
 def sum_component_value(component: int, value : Any):
     if component < 0:
         change_parameter_value(component, value)
+        return
     elif not component_values[selected_frame][component].activated:
         return
+        
     component_list[component].currentValue = component_list[component].currentValue + value
     component_values[selected_frame][component].value = component_list[component].currentValue
     update_row_ui(component)
