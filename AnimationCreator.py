@@ -59,8 +59,8 @@ except Exception:
   
 sequencer = DefaultMoveSequencer(
     {
-        (servoController, ServoChannelNames),
-        (ledController, LedChannelNames)
+        (servoController, Servos),
+        (ledController, Leds)
     }
 )
 
@@ -75,17 +75,17 @@ def comp_display_name(member: Enum) -> str:
 
 # Build full component master list
 ALL_COMPONENTS: List[Enum] = []
-ALL_COMPONENTS.extend(list(ServoChannelNames))
-ALL_COMPONENTS.extend(list(LedChannelNames))
+ALL_COMPONENTS.extend(list(Servos))
+ALL_COMPONENTS.extend(list(Leds))
 
 # Convert from display name to enum member
 def name_to_member(name: str) -> Enum:
     # expect form "ServoChannelNames.ELBOW_R"
     cls_name, member_name = name.split('.', 1)
     if cls_name == 'ServoChannelNames':
-        return getattr(ServoChannelNames, member_name)
+        return getattr(Servos, member_name)
     elif cls_name == 'LedChannelNames':
-        return getattr(LedChannelNames, member_name)
+        return getattr(Leds, member_name)
     else:
         raise KeyError(name)
 
@@ -176,8 +176,8 @@ class SequenceEditor:
             return False, f"File not found: {filename}"
         source = open(filename, 'r', encoding='utf-8').read()
         ns = {
-            'ServoChannelNames': ServoChannelNames,
-            'LedChannelNames': LedChannelNames,
+            'ServoChannelNames': Servos,
+            'LedChannelNames': Leds,
             "__name__": "__main__",
         }
         try:

@@ -4,4 +4,20 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "numpy>=2.2.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_talking_robot"]
+
+[dependency-groups]
+dev = [
+    "prompt-toolkit>=3.0.52",
+    "vpython>=7.6.5",
+    "setuptools<70.0.0",
+]

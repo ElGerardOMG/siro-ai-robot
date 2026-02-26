@@ -1,23 +1,25 @@
 import string
 
 class AAIModelController:
-    
-    ROLE_USER = "user"
-    ROLE_MODEL = "model"
-    
+       
     def __init__(self):
         pass
 
-    def setInstructions(self, instructions : str | None):
+    @property
+    def systemInstructions(self):
         pass
     
-    def addInitialMessage(self, role : str, message : str):
-        pass
-    
-    def clearContext(self):
+    @systemInstructions.setter
+    def systemInstructions(self, instructions: str | None):
         pass
 
     def newConversation(self):     
+        pass
+
+    def addMessage(self, userMessage : str, modelResponse : str):
+        pass
+    
+    def clearHistory(self):
         pass
         
     def sendMessage(self, message: str) -> str:

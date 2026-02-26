@@ -55,7 +55,7 @@ if __name__ == "__main__":
     ai.setInstructions(_ai_instructions)
 
     # Agregar el primer mensaje como dicho por parte de la IA
-    ai.addInitialMessage(AAIModelController.ROLE_MODEL, _ai_firstMessage)
+    ai.addMessage(AAIModelController.ROLE_MODEL, _ai_firstMessage)
     
     #### Reconocimiento de voz ####
     #recognition = DummyTextRecognition()

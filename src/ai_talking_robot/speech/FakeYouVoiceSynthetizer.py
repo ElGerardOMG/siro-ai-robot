@@ -19,9 +19,13 @@ INFERENCE_URL = "https://api.fakeyou.com/tts/inference"
 JOB_URL = "https://api.fakeyou.com/tts/job"
 AUDIO_URL = "https://cdn-2.fakeyou.com"
 
+
 class FakeYouVoiceSynthetizer(AVoiceSynthetizer, CLoggableObject):
 
     """
+        DEPRECATED!!!
+        Requiere refactorización
+        
         Sinterizador de FakeYou.com
         Hace peticiones al servidor, por lo que sólo se requiere
         de conexión a internet.
