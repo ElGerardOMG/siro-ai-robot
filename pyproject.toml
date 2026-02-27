@@ -6,6 +6,15 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.2.6",
+    "kokoro-onnx==0.5.0",
+    "misaki-fork==0.9.6",
+    "soundfile==0.13.1",
+    "pydub==0.25.1",
+    "simpleaudio-patched==1.0.5",
+    "scipy==1.17.1",
+    "google-genai==1.65.0",
+    "sounddevice==0.5.5",
+    "vosk==0.3.45"
 ]
 
 [build-system]

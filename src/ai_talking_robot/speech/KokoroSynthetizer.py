@@ -18,27 +18,28 @@ class KokoroSynthetizer(AVoiceSynthetizer):
         
         AVoiceSynthetizer.__init__(self,audioFactory)
         #kokoro = Kokoro("src/resources/models/kokoro/kokoro-v1.0.onnx", "src/resources/models/kokoro/voices-v1.0.bin")
-        self.kokoro = Kokoro(onnxFilePath, voicesBinPath)
-        self.g2p = None
+        self._kokoro = Kokoro(onnxFilePath, voicesBinPath)
+        self._g2p = None
 
-        self.voice = None
-        self.lang = None
-        self.speed = None
+        self._voice = None
+        self._lang = None
+        self._speed = 1.0
         
-        self.audio : AAudio = None
+        self._audio : AAudio = None
 
-    def synthetize(self, text: str):
-        self.audio = None
+    def synthetize(self, text: str) -> AAudio:
+        self._audio = None
         try:
-            phonemes, _ = self.g2p(text)
-            samples, sample_rate = self.kokoro.create(
+            phonemes, _ = self._g2p(text)
+            samples, sample_rate = self._kokoro.create(
                 phonemes, 
-                speed=self.speed, 
-                voice=self.voice, 
-                lang=self.lang, 
+                speed=self._speed, 
+                voice=self._voice, 
+                lang=self._lang, 
                 is_phonemes=True
             )
-            return self.audioFactory.create(NumpyArraySpec(data=samples, sample_rate=sample_rate))
+            self._audio = self.audioFactory.create(NumpyArraySpec(data=samples, sample_rate=sample_rate))
+            return self._audio
         except Exception as e:
             raise ValueError(f"Error: {e.with_traceback}")
             
@@ -46,17 +47,17 @@ class KokoroSynthetizer(AVoiceSynthetizer):
         """
         Devuelve el último audio sintetizado.
         """
-        return self.audio
+        return self._audio
         
     def setConfig(self, voice : str, language : str = "es", speed : float = 1.0):
         fallback = espeak.EspeakFallback(british=False)
 
         if language == "en":
-            self.g2p = en.G2P(trf=False, british=False, fallback=fallback)
+            self._g2p = en.G2P(trf=False, british=False, fallback=fallback)
         else:
-            self.g2p = EspeakG2P(language=language)
+            self._g2p = EspeakG2P(language=language)
         
-        self.voice = voice
-        self.lang = language
-        self.speed = speed
+        self._voice = voice
+        self._lang = language
+        self._speed = speed
         

@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     sequencer = DefaultMoveSequencer(
         [
-            (servoController, ServoChannelNames),
+            (servoController, Servos),
             
 
         ]

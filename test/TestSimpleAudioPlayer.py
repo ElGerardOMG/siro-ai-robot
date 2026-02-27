@@ -4,9 +4,9 @@ import wave
 
 from pathlib import Path
 
-from src.ia_talking_robot.audioplayer.SimpleAudioFactory import SimpleAudioFactory
-from src.ia_talking_robot.audioplayer.SimpleAudio import SimpleAudio
-from src.ia_talking_robot.audioplayer.AudioSpec import *
+from ai_talking_robot.audioplayer.SimpleAudioFactory import SimpleAudioFactory
+from ai_talking_robot.audioplayer.SimpleAudio import SimpleAudio
+from ai_talking_robot.audioplayer.AudioSpec import *
 
 def generar_onda_seno_int16(frecuencia=440, duracion=1.0, sample_rate=44100, amplitud=0.5):
     t = np.linspace(0, duracion, int(sample_rate * duracion), endpoint=False)

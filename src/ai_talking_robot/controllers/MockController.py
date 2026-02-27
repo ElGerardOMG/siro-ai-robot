@@ -1,7 +1,12 @@
 import numbers
+import logging
 #from ..log.CLoggableObject import CLoggableObject
 from ai_talking_robot.controllers.AComponentController import AComponentController
 from ai_talking_robot.sequencer.ComponentEnum import ComponentEnum
+
+
+
+log = logging.getLogger(__name__)
 
 """
     Mock controller que no hace nada, no está representa un controlador real.
@@ -29,19 +34,7 @@ class MockController(AComponentController):
 
             self._values[component.label] = value
         
-        #self.LOG(f"Called {self.name}:[{component.name}]:{value}")
+        log.debug(f"Llamado {self.name}:[{component.name}]:{value}")
 
     def getComponentValue(self, component : ComponentEnum):
         return self._values[component.label]
-"""
-    def setComponentValue(self, component : int, value):
-        if value is not None and isinstance(value, numbers.Number):
-            value = min(max(value, component.min_value), component.max_value)
-            value = round(value)
-        
-        self._values[component] = value
-        #self.LOG(f"Called {self.name}:[{component}]:{value}")
-
-    def getComponentValue(self, component : int):
-        return self._values[component]   
-        """

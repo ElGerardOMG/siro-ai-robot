@@ -8,7 +8,7 @@ class AVoiceSynthetizer:
         self.audioFactory = audioFactory
         pass
 
-    def synthetize(self, texto: str) -> AAudio:
+    def synthetize(self, text: str) -> AAudio:
         pass
 
     def getAudio(self) -> AAudio:

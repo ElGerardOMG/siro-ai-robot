@@ -46,3 +46,6 @@ class ComponentEnum(Enum):
     @currentValue.setter
     def currentValue(self, value):
         self._controller.setComponentValue(self, value)
+
+    def isInitialized(self) -> bool:
+        return self._controller is not None

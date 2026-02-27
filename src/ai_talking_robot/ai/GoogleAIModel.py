@@ -1,11 +1,11 @@
-from google import genai
-from google.genai import types
+#from google import genai
+from google.genai import types, Client
 from .AAIModelController import AAIModelController
 
 class GoogleAIModel(AAIModelController):
     
     def __init__(self, apiKey : str, model: str):
-        self._client = genai.Client(api_key=apiKey)
+        self._client = Client(api_key=apiKey)
         self._model = model
         self._chat : types.Chat = None
         
@@ -13,6 +13,7 @@ class GoogleAIModel(AAIModelController):
         self._initialHistory = []   
 
     #NOTA: No todos los modelos de Google (como los Gemma) permiten system instructions
+    # Por eso será simplemente mejor evitar estos
     @property
     def systemInstructions(self):
         if self._systemInstructions is not None:

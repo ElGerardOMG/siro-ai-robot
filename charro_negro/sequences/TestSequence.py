@@ -7,11 +7,11 @@ TestSequence = [
             "type" : "linear"
         },
         "components":{
-            ServoChannelNames.SHOULDER_L_X : 85,
-            ServoChannelNames.SHOULDER_R_Z : 10,
-            ServoChannelNames.SHOULDER_R_X : 0,
-            ServoChannelNames.SHOULDER_L_Z : 0,
-            ServoChannelNames.ELBOW_R : 0,
+            Servos.SHOULDER_L_X : 85,
+            Servos.SHOULDER_R_Z : 10,
+            Servos.SHOULDER_R_X : 0,
+            Servos.SHOULDER_L_Z : 0,
+            Servos.ELBOW_R : 0,
         }
     },
     {
@@ -20,11 +20,11 @@ TestSequence = [
             "type" : "linear"
         },
         "components":{
-            ServoChannelNames.SHOULDER_L_X : 180,
-            ServoChannelNames.SHOULDER_L_Z : 180,
-            ServoChannelNames.SHOULDER_R_X : 180,
-            ServoChannelNames.SHOULDER_R_Z : 180,
-            ServoChannelNames.ELBOW_R : 180,
+            Servos.SHOULDER_L_X : 180,
+            Servos.SHOULDER_L_Z : 180,
+            Servos.SHOULDER_R_X : 180,
+            Servos.SHOULDER_R_Z : 180,
+            Servos.ELBOW_R : 180,
         }
     },
     {
@@ -33,8 +33,8 @@ TestSequence = [
             "type" : "linear"
         },
         "components":{
-            LedChannelNames.RIGHT_EYE : 160,
-            LedChannelNames.LEFT_EYE : 160,
+            Leds.RIGHT_EYE : 160,
+            Leds.LEFT_EYE : 160,
         }
     },
     {
@@ -43,11 +43,11 @@ TestSequence = [
             "type" : "linear"
         },
         "components":{
-            ServoChannelNames.SHOULDER_L_X : 85,
-            ServoChannelNames.SHOULDER_L_Z : 0,
-            ServoChannelNames.SHOULDER_R_X : 0,
-            ServoChannelNames.SHOULDER_R_Z : 10,
-            ServoChannelNames.ELBOW_R : 0,
+            Servos.SHOULDER_L_X : 85,
+            Servos.SHOULDER_L_Z : 0,
+            Servos.SHOULDER_R_X : 0,
+            Servos.SHOULDER_R_Z : 10,
+            Servos.ELBOW_R : 0,
         }
     },
 ]
