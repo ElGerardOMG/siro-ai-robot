@@ -86,7 +86,7 @@ if __name__ == "__main__":
     log.debug(f"Primer mensaje de IA: {_ai_firstMessage}")
     # Establecer las instrucciones como primer mensaje y el primer mensaje del IA
     ai.addMessage(_ai_instructions, _ai_firstMessage)
-
+    
 
     
     #### Reconocimiento de voz ####

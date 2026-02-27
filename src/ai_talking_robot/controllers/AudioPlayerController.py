@@ -20,14 +20,14 @@ class AudioPlayerController(AComponentController):
             
     def setComponentValue(self, component : ComponentEnum, value):
         if value == 0:
-            if self.audioList[component.channel].isCurrentlyPlaying():
-                self.audioList[component.channel].stop()
+            if self._audioList[component.channel].isCurrentlyPlaying():
+                self._audioList[component.channel].stop()
         else:
-            if not self.audioList[component.channel].isCurrentlyPlaying():
-                self.audioList[component.channel].playAudioAsync()
+            if not self._audioList[component.channel].isCurrentlyPlaying():
+                self._audioList[component.channel].playAudioAsync()
         
     def getComponentValue(self,  component : ComponentEnum):
-        return 1 if self.audioList[component.channel].isCurrentlyPlaying() else 0
+        return 1 if self._audioList[component.channel].isCurrentlyPlaying() else 0
   
     
     

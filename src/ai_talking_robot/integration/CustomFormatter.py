@@ -11,11 +11,11 @@ class CustomFormatter(logging.Formatter):
 
     # Mapeo de Símbolos y Colores por nivel
     FORMATS = {
-        logging.DEBUG:    f"{grey}[d] %(message)s {reset}",
-        logging.INFO:     f"{blue}[i] %(message)s {reset}",
-        logging.WARNING:  f"{yellow}[!] %(message)s {reset}",
-        logging.ERROR:    f"{red}[x] %(message)s {reset}",
-        logging.CRITICAL: f"{bold_red}[X] %(message)s {reset}"
+        logging.DEBUG:    f"{grey}[d][%(module)s]: %(message)s {reset}",
+        logging.INFO:     f"{blue}[i][%(module)s]: %(message)s {reset}",
+        logging.WARNING:  f"{yellow}[!][%(module)s]: %(message)s {reset}",
+        logging.ERROR:    f"{red}[x][%(module)s]: %(message)s {reset}",
+        logging.CRITICAL: f"{bold_red}[X][%(module)s]: %(message)s {reset}"
     }
 
     def format(self, record):

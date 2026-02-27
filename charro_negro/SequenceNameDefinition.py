@@ -1,4 +1,5 @@
 
+#from charro_negro.sequences import FinAceptFinAcepta, FinRechaza
 from .sequences import *
 
 SequenceNameDefinition : dict[str, dict] = {
@@ -34,6 +35,18 @@ SequenceNameDefinition : dict[str, dict] = {
         "description" : "No hace nada",
         "sequence" : TestSequence
     },
+    "FIN ACEPTA":{
+        "description" : "Animación de término cuando el usuario acepta",
+        "sequence" : FinAcepta
+    },
+    "FIN RECHAZA":{
+        "description" : "Animación de término cuando el usuario rechaza",
+        "sequence" : FinRechaza
+    },
+    "FIN CANCELA":{
+        "description" : "Animación de término cuando el usuario no elige",
+        "sequence" : FinRechaza
+    }
     
 }
 

@@ -17,9 +17,9 @@ class Servos(ComponentEnum):
 class Leds(ComponentEnum):
     RIGHT_EYE = (0, 0, 255) 
     LEFT_EYE = (1, 0, 255)
-    LIGHT_SABER = (2, 0, 255)
 
 class Audios(ComponentEnum):
-    SABER_ON = (0, 0, 1)
-    SABER_OFF = (1, 0, 1)
-    ATTACK = (2, 0, 1)
+    LAUGH = (0, 0, 1)
+    BASS = (1, 0, 1)
+    CLOSE_CALL = (2, 0, 1)
+

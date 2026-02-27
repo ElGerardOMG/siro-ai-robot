@@ -75,8 +75,11 @@ class Robot():
             while True:
                 recognized = self._listen_user()
 
-                response = self._process_ai_response(recognized)
-
+                try:
+                    response = self._process_ai_response(recognized)
+                except:
+                    continue
+                
                 dialogue_object = self._director.parseTextToDialogue(response)
 
                 log.info(f"{self.robotName}> {dialogue_object.getCleanText()}")
@@ -154,7 +157,7 @@ class Robot():
                 log.debug(f"Respuesta obtenida: {response}")
                 return response
             except Exception as E:
-                if attempts >= self._maxAIAttempts:
+                if attempts >= self.maxAIAttempts:
                     log.exception("Fallo total en el procesamiento de IA ")
                     raise
                 else:
