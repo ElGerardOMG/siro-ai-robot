@@ -6,6 +6,7 @@ from ai_talking_robot.controllers.AComponentController import AComponentControll
 class LedController(AComponentController):
 
     def __init__(self, components : type[ComponentEnum], gpio_mode = GPIO.BCM):
+        super().__init__(self, components)
         
         if GPIO.getmode() is not None:
             if GPIO.getmode() != gpio_mode:
@@ -17,7 +18,6 @@ class LedController(AComponentController):
 
         self._ledStates = []
         for index, component in enumerate(components):
-            component.initialize(self)
             component.label = index
             self._ledStates.append(0)
             GPIO.setup(component.channel, GPIO.OUT)

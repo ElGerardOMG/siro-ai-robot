@@ -15,7 +15,9 @@ if TYPE_CHECKING:
 class AComponentController:
 
     def __init__(self, components : type[ComponentEnum]):
-        pass
+        for component in components:
+            component.initialize(self)
+
         
     def setComponentValue(self, component : ComponentEnum, value):
         pass

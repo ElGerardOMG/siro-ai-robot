@@ -15,12 +15,12 @@ log = logging.getLogger(__name__)
 """
 class MockController(AComponentController):
     def __init__(self, components : type[ComponentEnum], name: str = "controller"):
+        super().__init__(components)
         self.name = name
         self._components = components
-
+        
         self._values = []
         for index, component in enumerate(components):
-            component.initialize(self)
             component.label = index
             self._values.append(component.min_value)
        

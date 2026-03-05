@@ -12,6 +12,7 @@ from ai_talking_robot.audioplayer.AAudio import AAudio
 class AudioPlayerController(AComponentController):
 
     def __init__(self, components : type[ComponentEnum], audios : list[AAudio]):
+        
         self._components = components 
         self._audioList = audios 
 
