@@ -1,23 +1,23 @@
-#import io
+
 import importlib.util
 import pathlib
 import os
 
 from typing import Any
 from prompt_toolkit import Application
-from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.layout import HorizontalAlign
 from prompt_toolkit.layout.containers import VSplit, Window, HSplit, FloatContainer, Float, ConditionalContainer
-from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
+from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import TextArea, Frame
-from prompt_toolkit.layout import HorizontalAlign, Margin, WindowAlign
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.shortcuts import input_dialog
 from prompt_toolkit.filters import Condition
-from prompt_toolkit.application import get_app
 
 from ai_talking_robot.sequencer.ComponentEnum import ComponentEnum
 from ai_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
+
+from .AnimationCreatorConfig import get_config
+
 # Lista de tuplas (índice de valor del enum, ancho que ocupa en pantalla)
 # El valor en el tamaño None es toda la pantalla
 property_distribution = [
@@ -620,5 +620,5 @@ def load_animation(filename: str):
     update_all_component_values()
     change_selected_frame(0)
     
-
-    
+if __name__ == "__main__":
+    start(*get_config())

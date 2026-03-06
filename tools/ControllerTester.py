@@ -12,6 +12,7 @@ from prompt_toolkit.application import get_app
 
 from ai_talking_robot.sequencer.ComponentEnum import ComponentEnum
 
+from .ControllerTesterConfig import get_config
 # Lista de tuplas (índice de valor del enum, ancho que ocupa en pantalla)
 # El valor en el tamaño None es toda la pantalla
 property_distribution = [
@@ -115,7 +116,7 @@ def create_ui():
 
     help_windows = [
         Window(
-            content=FormattedTextControl(text=text, style="bg:#ffffff fg:#000000"),
+            content=FormattedTextControl(text=text),
             height=1
         )
         for text in help_texts
@@ -124,6 +125,8 @@ def create_ui():
     help_bar_1 = VSplit(children=help_windows[:3],align=HorizontalAlign.CENTER)
     help_bar_2 = VSplit(children=help_windows[3:],align=HorizontalAlign.CENTER)
 
+    help_bar_1.style = "bg:#ffffff fg:#000000"
+    help_bar_2.style = "bg:#ffffff fg:#000000"
     internal_container = HSplit(
             [VSplit(children=headers, height=1, padding=2)]
             +
@@ -197,16 +200,16 @@ def create_ui():
 def update_ui_selected_row():
     global previous_selected_component, selected_component
 
-    selectedRow : list[Window] = row_list[selected_component].get_children()
-    for window in selectedRow:
-        window.content.style = "bg:#ffffff fg:#000000"
+    selectedRow : list[Window] = row_list[selected_component]
+    selectedRow.style = "bg:#ffffff fg:#000000"
+    
 
     if previous_selected_component >= 0:
-        previousSelectedRow : list[Window] = row_list[previous_selected_component].get_children()
-        for window in previousSelectedRow:
-            window.content.style = "fg:#ffffff"
-        
-    selectedRow[value_col].content.text = f'{component_list[selected_component].currentValue}'
+        previousSelectedRow : list[Window] = row_list[previous_selected_component]
+        previousSelectedRow.style = "fg:#ffffff"
+
+
+    selectedRow.children[value_col].content.text = f'{component_list[selected_component].currentValue}'
 
 def update_ui_all_rows():
     for indx, row in enumerate(row_list):
@@ -214,81 +217,5 @@ def update_ui_all_rows():
 
     update_ui_selected_row()
 
-"""
-
-kb = KeyBindings()
-
-#buffer1 = Buffer()  # Editable buffer.
-
-totalElements = 10
-
-element_list = []
-element_table = []
-for i in range(totalElements):
-    #element_table.append([])
-    #element_table[i]["CHANNEL"] = 
-
-    element_list.append(VSplit(children= [
-        Window(content=FormattedTextControl(text=f'{i*2}'), width=2),
-        Window(content=FormattedTextControl(text=f'Display {i*500}'),),
-        Window(content=FormattedTextControl(text=f'300'), width=4),
-        Window(content=FormattedTextControl(text=f'400'), width=4),
-        Window(content=FormattedTextControl(text=f'500'), width=4),
-    ], height=1, padding=2,
-        
-    ))
-        
-        
-        
-
-    
-    
-
-
-root_container = HSplit(element_list)
-
-currentFocus = 0
-
-def changeFocus(value):
-    global currentFocus
-    something : Window = root_container.get_children()[currentFocus]
-    text : FormattedTextControl = something.content
-    text.style = "fg:#ffffff"
-    
-    currentFocus = (currentFocus + value + totalElements) % totalElements
-    get_app().layout.focus(root_container.get_children()[currentFocus])
-    something : Window = root_container.get_children()[currentFocus]
-    text : FormattedTextControl = something.content
-    text.style = "bg:#ffffff fg:#000000"
-    
-layout = Layout(root_container)
-
-root_container.
-@kb.add('c-q')
-def exit_(event):
-    event.app.exit()
-
-@kb.add('up')
-def e_(event):
-    changeFocus(-1)
-
-@kb.add('down')
-def d_(event):
-    changeFocus(1)
-
-@kb.add('left')
-def _(event):
-    global root_container
-    root_container.width -= 1
-
-@kb.add('right')
-def _(event):
-    global root_container
-    root_container.width += 1
-
-
-
-app = Application(key_bindings=kb, layout=layout, full_screen=True)
-app.run() # You won't be able to Exit this app
-
-"""
+if __name__ == "__main__":
+    start(*get_config())

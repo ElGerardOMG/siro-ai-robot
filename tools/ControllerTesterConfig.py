@@ -9,17 +9,11 @@ from ai_talking_robot.sequencer.SampleComponentDefinition import *
 from ai_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
 from .VirtualRobotController import VirtualRobotController
 
-#from .ControlerTester import start
+def get_config():
 
-from .AnimationCreator import start
-
-
-if __name__ == "__main__":
-
-    #mockServos = VirtualRobotController(Servos)
-    mockServos = VirtualRobotController(Servos)
-    #mockleds = MockController(Leds)
-    #mockaudios = MockController(Audios)
+    mockServos = MockController(Servos)
+    mockLeds = MockController(Leds)
+    
     sequencer = DefaultMoveSequencer()
 
-    start(sequencer, Servos)
+    return Servos, Leds
