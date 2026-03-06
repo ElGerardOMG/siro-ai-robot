@@ -12,12 +12,10 @@ from ai_talking_robot.audioplayer.AAudio import AAudio
 class AudioPlayerController(AComponentController):
 
     def __init__(self, components : type[ComponentEnum], audios : list[AAudio]):
-        
+        super().__init__(components)
         self._components = components 
         self._audioList = audios 
 
-        for component in components:
-            component.initialize(self)
             
     def setComponentValue(self, component : ComponentEnum, value):
         if value == 0:

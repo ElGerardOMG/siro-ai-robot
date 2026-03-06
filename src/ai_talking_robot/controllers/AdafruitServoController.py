@@ -9,7 +9,7 @@ class AdafruitServoController(AComponentController):
     Controller used for the PCA9685 when its connected over the Raspberry PI.
     """
     def __init__(self, components : type[ComponentEnum], componentCount = 16):
-        super().__init__(self, components)
+        super().__init__(components)
         
         self._components = components
 

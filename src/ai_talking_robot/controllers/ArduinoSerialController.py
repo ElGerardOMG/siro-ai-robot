@@ -24,6 +24,8 @@ class ArduinoSerialController(AComponentController):
     If the component's channel is 3 and its new value will be 50, then the message sent to the
     Arduino will look like this: "3,50"
 
+    A serial can be easily initialized like this:
+    serial = Serial(arduinoPort, baud_rate, timeout=timeout )
     """
     def __init__(self, components : type[ComponentEnum], serial : Serial, format : str):
         super(AComponentController).__init__(components)
