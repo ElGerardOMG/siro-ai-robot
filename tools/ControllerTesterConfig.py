@@ -12,8 +12,10 @@ from .VirtualRobotController import VirtualRobotController
 def get_config():
 
     mockServos = MockController(Servos)
+    #virtualServos = VirtualRobotController(Servos)
     mockLeds = MockController(Leds)
     
     sequencer = DefaultMoveSequencer()
+
 
     return Servos, Leds

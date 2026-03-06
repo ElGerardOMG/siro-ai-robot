@@ -22,11 +22,6 @@ class VirtualRobotController(AComponentController):
             
 
     def setComponentValue(self, component : ComponentEnum, value):
-        """
-        Envía el comando al simulador visual.
-        servo_name: String (ej. 'NECK_X')
-        angle: Float (grados)
-        """
         if value is None:
             return
             
@@ -42,32 +37,3 @@ class VirtualRobotController(AComponentController):
     def getComponentValue(self, component: ComponentEnum):
         return self._values[component.channel]
 
-# --- EJEMPLO DE USO (Lo que tú programarías) ---
-"""
-bot = VirtualRobotController()
-
-print("Iniciando secuencia de prueba...")
-
-# 1. Mover la cabeza (decir que No)
-for i in range(-30, 30, 2):
-    bot.setComponentValue("NECK_Y", i)
-    time.sleep(0.05)
-
-# 2. Levantar brazo izquierdo (Shoulder X)
-print("Levantando brazo...")
-for i in range(0, 90, 2):
-    bot.setComponentValue("SHOULDER_L_X", i)
-    time.sleep(0.02)
-
-# 3. Saludar (Mover antebrazo/codo)
-print("Saludando...")
-for _ in range(3):
-    for angle in range(0, 45, 5):
-        bot.setComponentValue("ELBOW_L", angle)
-        time.sleep(0.02)
-    for angle in range(45, 0, -5):
-        bot.setComponentValue("ELBOW_L", angle)
-        time.sleep(0.02)
-
-print("Prueba finalizada.")
-"""

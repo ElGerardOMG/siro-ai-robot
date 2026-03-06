@@ -1,14 +1,11 @@
-from pdb import Restart
 from typing import Any
-from numpy import vsplit
 from prompt_toolkit import Application
-from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.containers import VSplit, Window, HSplit
-from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
+from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.layout.layout import Layout
-from prompt_toolkit.layout import HorizontalAlign, Margin, WindowAlign
+from prompt_toolkit.layout import HorizontalAlign
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.application import get_app
+
 
 from ai_talking_robot.sequencer.ComponentEnum import ComponentEnum
 
@@ -46,8 +43,6 @@ def start(*componentEnums: type[ComponentEnum]):
 
     create_ui()
     
-    
-
 def changeSelectedComponent(newSelectedComponent : int):
     global selected_component, previous_selected_component
 

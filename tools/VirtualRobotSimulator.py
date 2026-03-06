@@ -36,7 +36,14 @@ jaw = box(pos=vector(0, 0.5, 1), size=vector(1.5, 0.5, 1.5), color=color.red)
 
 # Agrupamos cabeza y mandíbula para que roten juntas con el cuello
 head_group = compound([head, jaw], origin=vector(0, 1, 0))
-head_group.pos = vector(0, 2, 0) # Posición inicial sobre el cuello
+head_group.pos = vector(0, 2, 0) # Posición inicial sobre el 
+
+# --- NUEVO: Guardar el "Estado Cero" de la cabeza ---
+head_orig = {
+    "pos": vector(head_group.pos),
+    "axis": vector(head_group.axis),
+    "up": vector(head_group.up)
+}
 
 # 3. BRAZOS (Jerarquía simple)
 def create_arm(side_factor):
@@ -61,8 +68,7 @@ def create_arm(side_factor):
 left_arm = create_arm(1)
 right_arm = create_arm(-1)
 
-# --- ESTADO DE LOS SERVOS (Diccionario para guardar ángulos actuales) ---
-# Guardamos los ángulos actuales para calcular el "delta" de rotación
+# INFORMACIÓN DE CADA SERVO
 # Nombre: [Valor del ángulo, Desfase, Multiplicador]
 # Valor de ángulo: Valor donde se guarda el valor del ángulo actual
 # Desfase: Se suma el ángulo real para ajustarlo.
@@ -91,28 +97,15 @@ def update_robot(data):
         offset = current_angles[servo][1]
         multiplier = current_angles[servo][2]
 
-        # Convertir a radianes porque vpython usa radianes, pero los servos usualmente grados
+        # Calcular el ángulo de acuerdo al offset y el multiplicador
         target_angle_deg = float(data['angle']) * multiplier + offset
         
-
-        target_angle = radians(target_angle_deg)
-        
-        # Calcular cuánto hay que rotar desde la posición actual (Delta)
-        delta = target_angle - radians(current_angles.get(servo, [0])[0] )
-
-        #offset = current_angles[servo][1]
-        #multiplier = - current_angles[servo][2]
         current_angles[servo][0] = target_angle_deg # Actualizar memoria
         
-
-
         # Aplicar rotaciones
         
-        # --- CABEZA ---
-        if servo == "NECK_X": # Rotación "No"
-            head_group.rotate(angle=delta, axis=vector(0, 1, 0), origin=neck_base.pos)
-        elif servo == "NECK_Y": # Rotación "Sí"
-            head_group.rotate(angle=delta, axis=vector(1, 0, 0), origin=neck_base.pos)
+        if "NECK" in servo:
+            update_head_kinematics()
         
         # --- BRAZOS (Ahora usan cinemática directa) ---
         elif "SHOULDER_L" in servo or "ELBOW_L" in servo:
@@ -150,6 +143,29 @@ def update_arm_kinematics(arm, side_str):
     eje_codo = vector(1,0,0).rotate(angle=ang_x, axis=vector(0,0,1)).rotate(angle=ang_z, axis=vector(1,0,0))
     arm["fore_arm"].rotate(angle=ang_elbow, axis=eje_codo, origin=arm["elbow"].pos)
 
+def update_head_kinematics():
+    # Paso A: Reiniciar al Estado Cero absoluto
+    head_group.pos = vector(head_orig["pos"])
+    head_group.axis = vector(head_orig["axis"])
+    head_group.up = vector(head_orig["up"])
+    
+    # Paso B: Leer los ángulos absolutos de la memoria
+    ang_x = radians(current_angles["NECK_X"][0]) # Paneo (decir "No")
+    ang_y = radians(current_angles["NECK_Y"][0]) # Inclinación (decir "Sí")
+    
+    pivot = neck_base.pos # El origen de rotación es la base del cuello
+    
+    # Paso C: Aplicar rotaciones (Siempre Y primero, luego X)
+    
+    # 1. Rotación Pan (Y) - Sobre el eje vertical global
+    head_group.rotate(angle=ang_x, axis=vector(0, 1, 0), origin=pivot)
+    
+    # 2. Rotación Tilt (X) - ¡Cuidado aquí! El eje X debió haber girado con el paneo
+    # Calculamos el nuevo eje X local girando el eje X global la misma cantidad que el paneo
+    eje_x_local = vector(1, 0, 0).rotate(angle=ang_x, axis=vector(0, 1, 0))
+    
+    # Ahora sí, inclinamos la cabeza sobre su eje X local
+    head_group.rotate(angle=ang_y, axis=eje_x_local, origin=pivot)
    
 
 # --- LOOP PRINCIPAL ---
