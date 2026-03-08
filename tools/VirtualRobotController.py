@@ -22,18 +22,20 @@ class VirtualRobotController(AComponentController):
             
 
     def setComponentValue(self, component : ComponentEnum, value):
+        
         if value is None:
             return
-            
-        self._values[component.channel] = value
+        
+        self._values[component.label] = value
 
         payload = {
             "servo": component.name,
             "angle": value
         }
+        
         message = json.dumps(payload).encode()
         self.sock.sendto(message, (self.ip, self.port))
 
     def getComponentValue(self, component: ComponentEnum):
-        return self._values[component.channel]
+        return self._values[component.label]
 
