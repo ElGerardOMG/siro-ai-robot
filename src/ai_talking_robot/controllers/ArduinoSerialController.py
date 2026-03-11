@@ -34,11 +34,10 @@ class ArduinoSerialController(AComponentController):
 
         self._format = format
         self._serial = serial
-        self._values = []
+        self._values = {}
 
-        for indx, component in enumerate(components):
-            self._values.append(component.min_value)
-            component.label = indx
+        for component in components:
+            self._values.update({component.channel : component.min_value})
             
 
     def setComponentValue(self, component: ComponentEnum, value):
@@ -60,9 +59,9 @@ class ArduinoSerialController(AComponentController):
 
             log.debug(f'Enviando al arduino: {line}')
 
-            self._values[component.label] = value
+            self._values[component.channel] = value
 
     def getComponentValue(self, component: ComponentEnum):
-        return self._values[component.label]
+        return self._values[component.channel]
 
 

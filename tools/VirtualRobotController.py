@@ -7,18 +7,18 @@ from ai_talking_robot.sequencer.ComponentEnum import ComponentEnum
 
 class VirtualRobotController(AComponentController):
     def __init__(self, components: type[ComponentEnum], ip="127.0.0.1", port=5005):
+        super().__init__(components)
+
         self.ip = ip
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self._components = []
-        self._values = []
+        self._values = {}
 
-        for indx, component in enumerate(components):
-            component.label = indx
-            component.initialize(self)
+        for component in components:
             self._components.append(component)
-            self._values.append(component.min_value)
+            self._values.update({component.channel: component.min_value})
             
 
     def setComponentValue(self, component : ComponentEnum, value):
@@ -26,7 +26,7 @@ class VirtualRobotController(AComponentController):
         if value is None:
             return
         
-        self._values[component.label] = value
+        self._values[component.channel] = value
 
         payload = {
             "servo": component.name,
@@ -37,5 +37,5 @@ class VirtualRobotController(AComponentController):
         self.sock.sendto(message, (self.ip, self.port))
 
     def getComponentValue(self, component: ComponentEnum):
-        return self._values[component.label]
+        return self._values[component.channel]
 

@@ -22,10 +22,10 @@ class LedController(AComponentController):
 
         self._components = components
 
-        self._ledStates = []
-        for index, component in enumerate(components):
-            component.label = index
-            self._ledStates.append(0)
+        self._leds = {}
+
+        for component in components:
+            self._leds.update({component.channel : 0})
             GPIO.setup(component.channel, GPIO.OUT)
             GPIO.output(component.channel, GPIO.LOW)
             
@@ -33,10 +33,10 @@ class LedController(AComponentController):
         pin = component.channel
         if round(value):
             GPIO.output(pin, GPIO.HIGH)
-            self._ledStates[component.label] = 1
+            self._leds[component.channel] = 1
         else:
             GPIO.output(pin, GPIO.LOW)
-            self._ledStates[component.label] = 0
+            self._leds[component.channel] = 0
 
     def getComponentValue(self, component: ComponentEnum):
-        return self._ledStates[component.label]
+        return self._leds[component.channel]

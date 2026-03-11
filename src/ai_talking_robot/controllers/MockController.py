@@ -19,10 +19,9 @@ class MockController(AComponentController):
         self.name = name
         self._components = components
         
-        self._values = []
-        for index, component in enumerate(components):
-            component.label = index
-            self._values.append(component.min_value)
+        self._values = {}
+        for component in components:
+            self._values.update({component.channel : component.min_value})
        
         
     def setComponentValue(self, component : ComponentEnum, value):
@@ -32,9 +31,9 @@ class MockController(AComponentController):
                 value = min(max(value, component.min_value), component.max_value)
                 value = round(value)
 
-            self._values[component.label] = value
+            self._values[component.channel] = value
         
         log.debug(f"Llamado {self.name}:[{component.name}]:{value}")
 
     def getComponentValue(self, component : ComponentEnum):
-        return self._values[component.label]
+        return self._values[component.channel]
