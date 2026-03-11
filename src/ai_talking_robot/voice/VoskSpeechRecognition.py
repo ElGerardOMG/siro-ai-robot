@@ -36,10 +36,6 @@ class VoskSpeechRecognition(ASpeechRecognition):
         VoskSpeechRecognition._queue.put(bytes(indata))
 
     def startRecognition(self, silence_timeout: float | None = None) -> str:
-        """
-        Escucha por voz hasta que detecta X segundos de silencio continuo.
-        También imprime en el log los partial results.
-        """
         if silence_timeout is None:
             silence_timeout = self.SILENCE_TIMEOUT
 
