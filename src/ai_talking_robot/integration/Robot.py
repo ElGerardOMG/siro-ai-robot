@@ -17,7 +17,6 @@ import random
 from enum import Enum
 
 log = logging.getLogger(__name__)
-print(__name__)
 
 class Status(Enum):
     WAITING = 0
@@ -82,14 +81,14 @@ class Robot():
                 
                 dialogue_object = self._director.parseTextToDialogue(response)
 
-                log.info(f"{self.robotName}> {dialogue_object.getCleanText()}")
+                log.notice(f"[{self.robotName}>] {dialogue_object.getCleanText()}")
 
                 self.status = Status.SPEAKING
 
                 self._director.playDialogue(dialogue_object)
 
                 if self.end_dialogue_flags is not None and any(flag in response for flag in self.end_dialogue_flags):
-                    log.info(f"Terminando conversación...")
+                    log.notice(f"[CONVERSACIÓN TERMINADA]")
                     break
             # --- Bucle Conversacional
 
@@ -126,7 +125,7 @@ class Robot():
         self._inputA.waitForInput()
         self.status = Status.SPEAKING
         log.info("Iniciando ...")
-        log.info(f"{self.robotName}> {self._initial_dialogue_object.getCleanText()}")
+        log.notice(f"[{self.robotName}>] {self._initial_dialogue_object.getCleanText()}")
         self._director.playDialogue(self._initial_dialogue_object)
 
         self._aiModel.newConversation()
@@ -140,7 +139,7 @@ class Robot():
                 recognized = self._recognition.startRecognition()
                 if recognized is None or recognized == "":
                     recognized = "(*silencio)"
-                log.info(f"Usuario> {recognized}")
+                log.notice(f"[Usuario>] {recognized}")
                 return recognized
             except Exception as e:
                 log.exception("Fallo en el reconocimiento ")

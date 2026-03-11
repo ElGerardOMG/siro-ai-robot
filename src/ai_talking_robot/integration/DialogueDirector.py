@@ -10,8 +10,9 @@ from ai_talking_robot.integration.DialogueObject import DialogueStates
 from ai_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
 from ai_talking_robot.speech.KokoroSynthetizer import AVoiceSynthetizer
 
-log = logging.getLogger(__name__)
-print(__name__)
+main_log = logging.getLogger(__name__ +".main")
+synth_log = logging.getLogger(__name__+".synth")
+
 class DialogueDirector:
 
     def __init__(self, synthetizer : AVoiceSynthetizer, sequencer : DefaultMoveSequencer, availible_animations : dict[str, dict]):
@@ -25,27 +26,27 @@ class DialogueDirector:
         for dialogue in dialogues.items(): 
             try:
                 if dialogue.audio_status in [DialogueStates.EMPTY, DialogueStates.FAILED]:
-                    log.info("Sintetizado: " + dialogue.dialogue_text)
+                    synth_log.debug("Sintetizado: " + dialogue.dialogue_text)
                     dialogue.audio_status = DialogueStates.CREATING
                     audio = self.synthetizer.synthetize(text = dialogue.dialogue_text)
                     dialogue.audio = audio
                     dialogue.audio_status = DialogueStates.READY
-                    log.debug("Síntesis completa")
+                    synth_log.info("Síntesis completa")
                 else:
-                    log.debug("Nada que sintetizar")
+                    synth_log.debug("Nada que sintetizar")
                     continue
 
             except Exception:
-                log.exception("Error sintetizado: ")
+                synth_log.exception("Error sintetizado: ")
                 dialogue.audio_status = DialogueStates.FAILED
                 continue
-        log.debug("Síntesis completa de todos los audios")
+        synth_log.info("Síntesis completa de todos los audios")
             
     # Reproducir mientras se van sintetizando
     def playDialogue(self, dialogues : DialogueObject):
 
         # Iniciar la síntesis de fondo
-        log.debug("Iniciando hilo de síntesis...")
+        main_log.debug("Iniciando hilo de síntesis...")
         threading.Thread(target=self.synthesize, args=(dialogues,), daemon=True).start()
 
         previousAudio : AAudio = None
@@ -64,12 +65,12 @@ class DialogueDirector:
                     pass
             
             # Cambiar el estado a "PLAYING"
-            log.debug("Reproduciendo...")
+            main_log.debug("Reproduciendo...")
             dialogue.audio_status = DialogueStates.PLAYING
 
             # Reproducir el audio, si existe
             if dialogue.audio is not None:
-                log.debug("Reproduciendo Audio")
+                main_log.debug("Reproduciendo Audio")
                 dialogue.audio.playAudioAsync()
 
             # Reproducir la animación, si existe
@@ -83,7 +84,7 @@ class DialogueDirector:
                     animation = animation_dict.get("sequence")
                     animation_name = dialogue.animation
                 else:
-                    log.warning(f"Animación {dialogue.animation} no encontrada, usando fallback")
+                    main_log.warning(f"Animación {dialogue.animation} no encontrada, usando fallback")
 
                     if self.fall_back_animation_name is not None:
                         animation_dict = self.animations.get(self.fall_back_animation_name)
@@ -100,10 +101,10 @@ class DialogueDirector:
                 # Si hay audio, reproducir la animación en forma  no bloqueante.
                 # Sino, en forma bloqueante
                 if dialogue.audio is not None:
-                    log.info(f"Reproduciendo animación asíncrona {animation_name}")
+                    main_log.debug(f"Reproduciendo animación asíncrona {animation_name}")
                     threading.Thread(target=self.sequencer.executeSequence, args=(animation,), daemon=True).start()
                 else:
-                    log.info(f"Reproduciendo animación síncrona {animation_name}")
+                    main_log.debug(f"Reproduciendo animación síncrona {animation_name}")
                     self.sequencer.executeSequence(animation)
             
             # Asignar al previous audio, el actual
@@ -114,15 +115,16 @@ class DialogueDirector:
         
         # end for
 
-        log.debug(f"Esperando último audio")
+        main_log.debug(f"Esperando último audio")
         # Esperar a que el audio previo termine, si lo hay
         if previousAudio is not None:
             while previousAudio.isCurrentlyPlaying():
                 pass
 
+        # Cancelar ejecución, si la hay
+        self.sequencer.cancelExecution()
         
     
-
     def parseTextToDialogue(self, text : str) -> DialogueObject:
         splitted = re.split(r'(\[[^\]]+\])', text)[1:]
 
