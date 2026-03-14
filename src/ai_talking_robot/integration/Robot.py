@@ -65,7 +65,8 @@ class Robot():
 
         while True:
           
-            self._sequencer.executeSequence(self._idle_animation)
+            if self._idle_animation is not None:
+                self._sequencer.executeSequence(self._idle_animation)
 
             self._await_initialization()
             
@@ -93,16 +94,6 @@ class Robot():
             # --- Bucle Conversacional
 
         # --- Bucle Principal
-
-    """
-        def _replaceWords(self, texto : str):
-            nuevoTexto = texto
-            for t in self._replacingWords:
-                nuevoTexto = nuevoTexto.replace(t[0],t[1])
-
-            return nuevoTexto
-
-    """
 
     def _initialize(self):
         self._initial_dialogue_object = self._director.parseTextToDialogue(self.initial_dialogue_text)

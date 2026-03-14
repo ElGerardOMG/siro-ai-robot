@@ -75,15 +75,18 @@ class DialogueDirector:
 
             # Reproducir la animación, si existe
             if dialogue.animation is not None:
-                
+                # Reestablecer la animación
+                animation = None
                 # Obtener la animación
                 animation_dict = self.animations.get(dialogue.animation)
 
-                # Obtenerla, si es nula, obtener una default
+                # Intentar la animación como tal, si es que no es None
                 if animation_dict is not None:
                     animation = animation_dict.get("sequence")
                     animation_name = dialogue.animation
-                else:
+
+                # Si al final no se obtuvo nada, utilizar el fallback    
+                if animation is None:
                     main_log.warning(f"Animación {dialogue.animation} no encontrada, usando fallback")
 
                     if self.fall_back_animation_name is not None:
@@ -93,7 +96,7 @@ class DialogueDirector:
                     else:
                         animation = []
                         animation_name = "Empty"
-                    pass
+                
                 
                 # Cancelar ejecución, si la hay
                 self.sequencer.cancelExecution()
