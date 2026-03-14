@@ -8,6 +8,5 @@ pyvenv.cfg
 __pycache__/
 resources/models/*
 **/secrets.json
-test/**
 /resources/models/**
 **.log

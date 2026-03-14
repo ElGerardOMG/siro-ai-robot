@@ -1,38 +1,57 @@
-from src.ia_talking_robot.audioplayer import AudioSource
-from src.ia_talking_robot.audioplayer.SimpleAudioFactory import SimpleAudioFactory
-from src.ia_talking_robot.controllers.AudioPlayerController import AudioPlayerController
-from src.ia_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
-from src.ia_talking_robot.sequencer.SampleComponentDefinition import *
-from src.ia_talking_robot.sequencer.SampleAudioSequence import SampleAudioSequence
-from src.ia_talking_robot.audioplayer.AudioSpec import WavFileSpec
-from src.ia_talking_robot.log.ConsoleLogger import ConsoleLogger
+import numpy as np
 
-from src.ia_talking_robot.controllers.MockController import MockController
-    
+
+from ai_talking_robot.audioplayer.SimpleAudioFactory import SimpleAudioFactory
+from ai_talking_robot.controllers.AudioPlayerController import AudioPlayerController
+from ai_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
+from ai_talking_robot.audioplayer.AudioSpec import NumpyArraySpec
+from ai_talking_robot.controllers.ParallelControlerWrapper import ParallelControllerWrapper
+
+from ai_talking_robot.controllers.MockController import MockController
+
+from test.SampleTestAnimationSuite import *
+
+import logging
+import sys
+log = logging.getLogger()
 
 
 if __name__ == "__main__":
-    logger = ConsoleLogger()
-    servoController = MockController(16,"Servo")
-    servoController.addNewLogger(logger)
+
+    #logging.basicConfig(filename='myapp.log', level=logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('[%(module)s]: %(message)s')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+    log.setLevel(logging.DEBUG)
+    
+
+    servoController = MockController(SampleComponents,"Servo")
+    servoController = ParallelControllerWrapper(servoController)
 
     audioFactory = SimpleAudioFactory()
-    
-    audio_1 = audioFactory.create(WavFileSpec(path="src/darth_vader/audios/saber_on.wav"))
-    audio_2 = audioFactory.create(WavFileSpec(path="src/darth_vader/audios/saber_off.wav"))
-    audio_3 = audioFactory.create(WavFileSpec(path="src/darth_vader/audios/attack.wav"))
 
+    audios = []
+    for i in range(3):
+        duracion = 3.0
+        sample_rate = 44100
+        frecuencia = 400 + 40 * i
+        amplitud = 0.02
+        t = np.linspace(0, duracion, int(sample_rate * duracion), endpoint=False)
+        onda = amplitud * np.sin(2 * np.pi * frecuencia * t)
+        onda = onda.astype(np.float32)
+        onda_int16 = np.int16(onda * 32767)
 
-    audioController = AudioPlayerController([audio_1, audio_2, audio_3])
+        audios.append(audioFactory.create(NumpyArraySpec(onda_int16, sample_rate)))
 
-    sequencer = DefaultMoveSequencer(
-        [
-            (servoController, Servos),
-            (audioController, Audios),
+    audioController = ParallelControllerWrapper(AudioPlayerController(SampleComponentsAudios, audios))
 
-        ]
-    )
+    sequencer = DefaultMoveSequencer()
+    sequencer.valueUpdateInterval = 0.5
+
     print("Ejecutando con sonido...")
-    sequencer.setTimePartionSize(0.2)
 
-    sequencer.executeSequence(SampleAudioSequence)
+    sequencer.valueUpdateInterval = 0.2
+
+    sequencer.executeSequence(FIN_ANIM)
