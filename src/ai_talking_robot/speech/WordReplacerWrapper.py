@@ -2,7 +2,7 @@ from ai_talking_robot.speech.AVoiceSynthetizer import AVoiceSynthetizer
 from ai_talking_robot.audioplayer import AAudio
 from ai_talking_robot.audioplayer.AAudioFactory import AAudioFactory
 
-class WordReplacerWrapepr(AVoiceSynthetizer):
+class WordReplacerWrapper(AVoiceSynthetizer):
 
     """
     A simple wrapper that replaces the words provided by the replacing_words dict parameter before

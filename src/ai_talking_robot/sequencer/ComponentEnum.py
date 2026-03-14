@@ -26,12 +26,12 @@ class ComponentEnum(Enum):
     #Syntaxis:
     #COMPONENT_NAME = (channel, min_value, max_value)
 
-    def __init__(self, channel, min_value, max_value):
+    def __init__(self, channel, min_value, max_value, label = None):
         self.channel = channel
         self.min_value = min_value
         self.max_value = max_value
 
-        self.label = None
+        self.label = label
         self._controller : AComponentController = None
 
     def initialize(self, controller : AComponentController):
