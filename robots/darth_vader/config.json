@@ -1,0 +1,58 @@
+{
+  "ai": {
+    "instructions": "Eres Darth Vader, actúa como tal. Tu objetivo es convencer al usuario de unirse al imperio galáctico en base a su virtud o profesión. Sigue estas reglas: \n1. Si el usuario acepta unirse, deberás terminar la conversación con [FIN ACEPTA] \n2. Si el usuario rechaza unirse, puedes insistir 1 vez. \n3. Si el usuario rechaza definitivamente, deberás acabarlo con tu sable de luz, agregando [FIN ATACA] al final de la conversación y terminándo la conversación. \n4. La conversación no debe sobrepasar los 4 mensajes de cada conversador. \n5. Si el límite de mensajes sería alcanzado y el usuario no ha tomado una decisión definitiva, deberás acabarlo con tu sable de luz agregando [FIN ATACA] al final de la conversación y terminando la conversación. \n6. Formatea la respuesta agregando un sólo ademán o acción física al principio de cada frase de la siguiente forma:\n [ADEMAN_1] Frase 1 \n [ADEMAN_2] Frase 2\n7. Sólo puedes incluir ademanes, acciones o expresiones de esta forma y sólo los nombres de los siguientes ademanes:\n",
+
+    "first_model_message": "[ADEMAN_1] Soy Darth Vader, Señor oscuro de los Sith. Dime cuál es tu más grande virtud.",
+    "model": "gemma-3-27b-it"
+  },
+  "finalization_flags":[
+    "FIN ACEPTA", "FIN ATACA", "FIN"
+  ],
+  "robot_name": "Darth Vader",
+  "vosk_model_path" : "resources/models/vosk-model-es-0.42",
+  "audio_filter": {
+    "pitch_semitones": -4,
+    "echo_delay": 0.008,
+    "echo_decay": 0.6,
+    "overlay_delay": 0.01,
+    "gain": 0.5
+  },
+  "voice": {
+    "engine": "kokoro",
+    "onnx_file_path" : "resources/models/kokoro/kokoro-v1.0.onnx",
+    "voices_file_path" : "resources/models/kokoro/voices-v1.0.bin",
+    "voice": "pm_alex",
+    "language": "es",
+    "speed": 1.0
+  },
+  "speech_replacements": {
+    "Vader": "Véider",
+    "Darth": "Dart",
+    "Luke": "Luq",
+    "Yo " : "Llo ",
+    "Stormtrooper": "Estorm trúper",
+    "Anakin": "Ánaquin",
+    "Skywalker": "Escai guólquer",
+    "Sidious": "Sídius",
+    "Obi Wan": "Obi guán",
+    "Obi-Wan": "Obi guán",
+    "Grievous": "Grívus",
+    "Kylo": "Cáilo"
+  },
+  "idle": {
+    "sound_wavs": [
+      "/audios/breathing.wav"
+    ],
+    "play_audio_interval": 3.0
+  },
+  "sequence_audios":[
+    "/audios/saber_on.wav",
+    "/audios/saber_off.wav",
+    "/audios/attack.wav",
+    "/audios/imperial_march.wav"
+  ],
+  "excluded_sequences_from_ai_prompt":[
+    "IDLE", "FIN ACEPTA", "FIN ATACA", "FIN RECHAZA"
+  ],
+  "idle_sequence":"IDLE"
+}
