@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitectura - AI Talking Robot</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html">Inicio</a>
+      <a href="arquitectura.html" class="current">Arquitectura</a>
+      <a href="modulos.html">Módulos</a>
+      <a href="controladores.html">Controladores</a>
+      <a href="tutorial-robot.html">Tutorial: Crear un robot</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Arquitectura del sistema</h1>
+    <p>El punto de entrada es <code>integration/Robot.py</code>. Ahí se orquesta el bucle principal y el bucle conversacional.</p>
+
+    <h2>Estados del robot</h2>
+    <p>El robot tiene un estado (<code>Status</code>) que indica en qué fase está:</p>
+    <ul>
+      <li><strong>WAITING</strong> — Esperando que el usuario active la conversación (por ejemplo pulsar Enter o hablar).</li>
+      <li><strong>LISTENING</strong> — Escuchando al usuario (reconocimiento de voz activo).</li>
+      <li><strong>THINKING</strong> — Enviando el mensaje a la IA y esperando respuesta.</li>
+      <li><strong>SPEAKING</strong> — Reproduciendo la respuesta (voz + animaciones).</li>
+    </ul>
+
+    <h2>Bucle principal</h2>
+    <ol>
+      <li><strong>Inicialización</strong> — Se sintetiza el diálogo inicial, se resuelve la animación idle y, si está definido, se arranca el comportamiento idle en un hilo (por ejemplo sonidos en bucle).</li>
+      <li><strong>Bucle infinito exterior:</strong>
+        <ul>
+          <li>Si hay animación idle, se ejecuta en el secuenciador.</li>
+          <li><strong>Esperar activación</strong> — Estado WAITING; el activador de entrada (p. ej. Enter o voz) espera hasta que el usuario quiera empezar. Luego se reproduce el mensaje inicial y se inicia una nueva conversación en la IA.</li>
+          <li><strong>Bucle conversacional</strong> (ver abajo). Al salir de este bucle (por bandera de finalización), se vuelve a idle y a esperar una nueva activación.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h2>Bucle conversacional</h2>
+    <div class="flow-step"><span class="flow-num">1</span> <strong>Escuchar:</strong> Estado LISTENING. El reconocimiento de voz se activa hasta obtener texto (o <code>(*silencio)</code> si no se reconoce nada).</div>
+    <div class="flow-step"><span class="flow-num">2</span> <strong>Pensar:</strong> Estado THINKING. Se envía el texto a la IA (con reintentos hasta <code>maxAIAttempts</code>).</div>
+    <div class="flow-step"><span class="flow-num">3</span> <strong>Responder:</strong> La respuesta se parsea con <code>DialogueDirector.parseTextToDialogue()</code> y se obtiene un <code>DialogueObject</code> (lista de ítems: animación + texto).</div>
+    <div class="flow-step"><span class="flow-num">4</span> <strong>Reproducir:</strong> Estado SPEAKING. <code>DialogueDirector.playDialogue()</code> sintetiza voz, reproduce audio y ejecuta la secuencia asociada a cada bandera en el secuenciador.</div>
+    <div class="flow-step"><span class="flow-num">5</span> <strong>Salir:</strong> Si <code>end_dialogue_flags</code> está definido y alguna de esas banderas aparece en la respuesta, se hace <code>break</code> y se termina el bucle conversacional (vuelta a idle y espera de nueva inicialización).</div>
+
+    <h2>Banderas en las respuestas de la IA</h2>
+    <p>En el prompt se indica a la IA que formatee así:</p>
+    <ul>
+      <li><code>[NOMBRE_ANIMACION]</code> — Indica qué animación/gesto ejecutar antes (o durante) la frase que sigue. El nombre debe coincidir con una entrada en el diccionario de animaciones del robot (<code>SequenceNameDefinition</code>).</li>
+      <li><code>[FIN ACEPTA]</code>, <code>[FIN RECHAZA]</code>, etc. — Banderas de finalización. Si alguna está en <code>end_dialogue_flags</code>, al aparecer en la respuesta se termina la conversación.</li>
+    </ul>
+    <p>Ejemplo de respuesta esperada:</p>
+    <pre class="card" style="white-space: pre-wrap;"><code>[ADEMAN_1] Soy Darth Vader.
+[ADEMAN_2] Dime cuál es tu virtud.</code></pre>
+
+    <h2>De la respuesta al hardware</h2>
+    <ol>
+      <li><strong>Parseo:</strong> <code>parseTextToDialogue(text)</code> divide por el patrón <code>[...]</code> y arma ítems (animación + texto).</li>
+      <li><strong>Por cada ítem:</strong> Se sintetiza el texto a audio, se reproduce y se busca la secuencia por nombre. Se cancela la ejecución actual del secuenciador y se ejecuta la nueva secuencia (en hilo si hay audio, bloqueante si no).</li>
+      <li><strong>Secuenciador:</strong> Una secuencia es una lista de pasos; cada paso tiene <code>parameters.time</code> y <code>components</code> (ComponentEnum → valor). El secuenciador interpola en el tiempo y asigna <code>component.currentValue = ...</code>.</li>
+      <li><strong>Componentes y controladores:</strong> Cada <code>ComponentEnum</code> está vinculado a un <code>AComponentController</code>. Al escribir <code>currentValue</code>, se llama a <code>setComponentValue()</code> del controlador, que envía el valor al hardware (serial, UDP, GPIO, etc.).</li>
+    </ol>
+  </main>
+
+  <footer class="container footer">
+    <a href="index.html">Inicio</a> · AI Talking Robot — Documentación
+  </footer>
+</body>
+</html>

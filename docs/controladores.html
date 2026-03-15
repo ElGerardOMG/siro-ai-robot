@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controladores - AI Talking Robot</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html">Inicio</a>
+      <a href="arquitectura.html">Arquitectura</a>
+      <a href="modulos.html">Módulos</a>
+      <a href="controladores.html" class="current">Controladores</a>
+      <a href="tutorial-robot.html">Tutorial: Crear un robot</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Controladores de componentes</h1>
+    <p>Los controladores traducen los valores de las animaciones (secuenciador) al hardware real. La interfaz común es <code>AComponentController</code>: recibe un enum que hereda de <code>ComponentEnum</code> y en el constructor llama a <code>component.initialize(self)</code> para cada miembro. Métodos a implementar: <code>setComponentValue(component, value)</code> y <code>getComponentValue(component)</code>.</p>
+
+    <h2>Implementaciones disponibles</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Clase</th>
+          <th>Uso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>MockController</code></td>
+          <td>Simula el controlador: guarda valores en un diccionario por canal. Útil en pruebas o sin hardware.</td>
+        </tr>
+        <tr>
+          <td><code>ArduinoSerialController</code></td>
+          <td>Envía comandos por puerto serial. Usa una plantilla con placeholders (name, channel, value, min_value, max_value, label) y envía una línea por cada <code>setComponentValue</code>.</td>
+        </tr>
+        <tr>
+          <td><code>AdafruitServoController</code></td>
+          <td>Control de servos con PCA9685 (ServoKit) en Raspberry Pi. El canal del enum es el canal del servo; el valor se interpreta como ángulo entre min_value y max_value.</td>
+        </tr>
+        <tr>
+          <td><code>LedController</code></td>
+          <td>GPIO en Raspberry Pi. El <code>channel</code> del enum es el número de pin; valor distinto de 0 → HIGH, 0 → LOW.</td>
+        </tr>
+        <tr>
+          <td><code>RemoteUDPController</code></td>
+          <td>Envía un JSON por UDP con los campos que definas (name, channel, value, etc.). Útil para controlar otro proceso o dispositivo en la red.</td>
+        </tr>
+        <tr>
+          <td><code>ParallelControllerWrapper</code></td>
+          <td>Envuelve otro controlador y ejecuta <code>setComponentValue</code> en un hilo con cola y timeout, para no bloquear si el controlador se cuelga.</td>
+        </tr>
+        <tr>
+          <td><code>AudioPlayerController</code></td>
+          <td>Los componentes son índices de una lista de <code>AAudio</code>. <code>setComponentValue(component, 0)</code> = stop; otro valor = <code>playAudioAsync()</code>. Sirve para sonidos dentro de secuencias.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Cómo decidir qué controlador usar</h2>
+    <ul>
+      <li><strong>Sin hardware / pruebas:</strong> <code>MockController</code>.</li>
+      <li><strong>Servos por Arduino:</strong> <code>ArduinoSerialController</code> con tu formato de string (ej. <code>"S,{channel},{value}\n"</code>).</li>
+      <li><strong>Servos en Raspberry con PCA9685:</strong> <code>AdafruitServoController</code>.</li>
+      <li><strong>LEDs en Raspberry (GPIO):</strong> <code>LedController</code>.</li>
+      <li><strong>Control remoto (otro programa, otra máquina):</strong> <code>RemoteUDPController</code> con el formato JSON que espere el receptor.</li>
+      <li><strong>Reproducir sonidos en secuencias:</strong> <code>AudioPlayerController</code> con un enum cuyos miembros tengan <code>label</code> con la ruta del WAV (o audios creados por fábrica).</li>
+      <li><strong>Controlador lento o bloqueante:</strong> Envolver con <code>ParallelControllerWrapper</code>.</li>
+    </ul>
+
+    <h2>Cómo implementar un controlador</h2>
+    <ol>
+      <li>Crear una clase que herede de <code>AComponentController</code>.</li>
+      <li>En el constructor recibir el tipo de enum (p. ej. <code>Servos</code>) y opcionalmente parámetros de conexión (puerto, IP, etc.). El padre ya hace <code>for component in components: component.initialize(self)</code>.</li>
+      <li>Implementar <code>setComponentValue(component, value)</code>: usar <code>component.channel</code>, <code>component.min_value</code>, <code>component.max_value</code>, <code>component.label</code> según necesites y enviar el valor al hardware.</li>
+      <li>Implementar <code>getComponentValue(component)</code>: devolver el valor actual si el hardware lo permite, o un valor por defecto.</li>
+    </ol>
+    <p>Cada robot define sus enums en <code>ComponentNameDefinition.py</code> (p. ej. <code>Servos</code>, <code>Leds</code>, <code>AudioNames</code>) y asigna un controlador por cada tipo. Ver <a href="tutorial-robot.html">Tutorial: Crear un robot</a> y los robots en <code>robots/darth_vader</code> y <code>robots/charro_negro</code> como referencia.</p>
+  </main>
+
+  <footer class="container footer">
+    <a href="index.html">Inicio</a> · AI Talking Robot — Documentación
+  </footer>
+</body>
+</html>

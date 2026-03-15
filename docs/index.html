@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Talking Robot - Documentación</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="current">Inicio</a>
+      <a href="arquitectura.html">Arquitectura</a>
+      <a href="modulos.html">Módulos</a>
+      <a href="controladores.html">Controladores</a>
+      <a href="tutorial-robot.html">Tutorial: Crear un robot</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>AI Talking Robot</h1>
+    <p>Documentación del proyecto en español.</p>
+
+    <h2>¿Qué es este proyecto?</h2>
+    <p>Es un framework para programar un <strong>robot físico</strong> con capacidad de <strong>conversar con personas</strong>. Combina:</p>
+    <ul>
+      <li><strong>Síntesis de voz</strong> — para que el robot hable (por defecto Kokoro TTS).</li>
+      <li><strong>Reconocimiento de voz</strong> — para escuchar al usuario (por defecto Vosk).</li>
+      <li><strong>Inteligencia artificial</strong> — para generar respuestas (por defecto Google AI).</li>
+      <li><strong>Control físico</strong> — servos, LEDs, audio, etc., mediante controladores intercambiables.</li>
+    </ul>
+    <p>El diseño permite <strong>cambiar</strong> cada tecnología (otro TTS, otro modelo de IA, otro reconocedor) sin reescribir el núcleo del código, gracias a clases abstractas (prefijo <code>A</code>) e implementaciones concretas.</p>
+
+    <h2>¿Cómo funciona en una frase?</h2>
+    <p>El programa principal (<code>Robot.py</code>) ejecuta un <strong>bucle conversacional</strong>: escucha al usuario, envía el texto a la IA y reproduce la respuesta del robot. En el <strong>prompt</strong> se le pide a la IA que formatee sus respuestas con <strong>banderas</strong> entre corchetes (por ejemplo <code>[ADEMAN_1]</code> o <code>[FIN ACEPTA]</code>). Esas banderas disparan <strong>animaciones o secuencias</strong> en el robot (movimientos, sonidos) o indican el <strong>fin de la conversación</strong>.</p>
+
+    <h2>Estructura del repositorio</h2>
+    <ul>
+      <li><span class="path">src/ai_talking_robot/</span> — Código principal (integración, controladores, secuenciador, voz, IA, audio, entrada).</li>
+      <li><span class="path">robots/</span> — Implementaciones de ejemplo: <strong>Charro Negro</strong> y <strong>Darth Vader</strong>, listas para ejecutar.</li>
+      <li><span class="path">docs/</span> — Esta documentación (HTML/CSS).</li>
+    </ul>
+
+    <h2>Enlaces rápidos</h2>
+    <ul>
+      <li><a href="arquitectura.html">Arquitectura</a> — Bucle principal, estados, banderas y flujo de diálogo.</li>
+      <li><a href="modulos.html">Módulos</a> — Descripción de cada módulo en <code>src/ai_talking_robot</code>.</li>
+      <li><a href="controladores.html">Controladores</a> — Qué controlador usar y cómo implementarlo.</li>
+      <li><a href="tutorial-robot.html">Tutorial: Crear un robot</a> — Guía paso a paso para definir un nuevo robot.</li>
+    </ul>
+  </main>
+
+  <footer class="container footer">
+    AI Talking Robot — Documentación en español. Sin JavaScript.
+  </footer>
+</body>
+</html>

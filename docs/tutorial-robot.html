@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial: Crear un robot - AI Talking Robot</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html">Inicio</a>
+      <a href="arquitectura.html">Arquitectura</a>
+      <a href="modulos.html">Módulos</a>
+      <a href="controladores.html">Controladores</a>
+      <a href="tutorial-robot.html" class="current">Tutorial: Crear un robot</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Tutorial: Crear un robot</h1>
+    <p>Guía rápida para definir un nuevo robot usando la estructura de <code>robots/</code>. Puedes copiar <code>robots/darth_vader</code> o <code>robots/charro_negro</code> como plantilla.</p>
+
+    <h2>1. Estructura de carpetas</h2>
+    <p>Crea una carpeta dentro de <code>robots/</code>, por ejemplo <code>mi_robot/</code>, con:</p>
+    <ul>
+      <li><code>config.json</code> — Configuración del robot (IA, voz, banderas, idle, etc.).</li>
+      <li><code>secrets.json</code> — Credenciales (p. ej. <code>google_api_key</code>). No subas este archivo al repositorio.</li>
+      <li><code>ComponentNameDefinition.py</code> — Enums de componentes (servos, LEDs, audios) que heredan de <code>ComponentEnum</code>.</li>
+      <li><code>SequenceNameDefinition.py</code> — Diccionario nombre → { description, sequence } para animaciones.</li>
+      <li><code>sequences/</code> — Módulos Python que definen listas de movimientos (una lista por animación).</li>
+      <li><code>audios/</code> — Archivos WAV para idle y secuencias (opcional).</li>
+      <li><code>main.py</code> — Punto de entrada: carga config, instancia IA, reconocimiento, sintetizador, controladores, secuenciador, director y Robot; asigna parámetros y llama a <code>main.start()</code>.</li>
+    </ul>
+
+    <h2>2. Definir componentes (ComponentNameDefinition.py)</h2>
+    <p>Cada enum representa un conjunto de componentes manejados por un mismo controlador. Sintaxis por miembro:</p>
+    <ul>
+      <li>Servos/LEDs: <code>NOMBRE = (channel, min_value, max_value)</code></li>
+      <li>Audios (para AudioPlayerController): <code>NOMBRE = (channel, 0, 1, ruta_wav)</code> — el cuarto valor es el <code>label</code> (ruta del archivo).</li>
+    </ul>
+    <p>Ejemplo (Darth Vader):</p>
+    <pre class="card"><code>class Servos(ComponentEnum):
+    NECK_X = (1, 0, 180)
+    SHOULDER_L_X = (3, 0, 180)
+    ...
+
+class Leds(ComponentEnum):
+    EYES = (0, 0, 255)
+    LIGHT_SABER = (1, 0, 255)
+
+class AudioNames(ComponentEnum):
+    SABER_ON = (0, 0, 1, f"{BASE_DIR}/audios/saber_on.wav")
+    ...</code></pre>
+
+    <h2>3. Definir secuencias (sequences/)</h2>
+    <p>Cada archivo en <code>sequences/</code> (excepto <code>__init__.py</code>) puede exportar listas. El <code>__init__.py</code> descubre los módulos y rellena el diccionario <code>SEQUENCES</code> (nombre de la variable → lista).</p>
+    <p>Cada secuencia es una lista de pasos. Cada paso es un dict:</p>
+    <ul>
+      <li><code>"parameters": { "time": segundos, "type": "linear" }</code></li>
+      <li><code>"components": { ComponentEnum: valor_numérico o None }</code> — Si el valor es <code>None</code>, se aplica de inmediato.</li>
+    </ul>
+    <p>Ejemplo (Ademan_1.py):</p>
+    <pre class="card"><code>from ..ComponentNameDefinition import *
+
+Ademan_1 = [
+  { "parameters": { "time": 0.9, "type": "linear" },
+    "components": {
+      Servos.NECK_X : 0,
+      Servos.SHOULDER_L_X : 0,
+      ...
+    },
+  },
+  { "parameters": { "time": 0.7, "type": "linear" },
+    "components": { ... },
+  },
+]</code></pre>
+
+    <h2>4. SequenceNameDefinition.py</h2>
+    <p>Asocia un nombre (el que la IA usará en las banderas) con descripción (para el prompt) y la secuencia (desde <code>SEQUENCES</code>):</p>
+    <pre class="card"><code>from .sequences import SEQUENCES
+
+SequenceNameDefinition = {
+    "ADEMAN_1": {
+        "description": "Ademán simple mientras habla 1",
+        "sequence": SEQUENCES.get("Ademan_1")
+    },
+    "IDLE": { "description": "No hace nada", "sequence": SEQUENCES.get("Idle") },
+    "FIN ACEPTA": { "description": "Animación de término cuando acepta", "sequence": SEQUENCES.get("SoundEffect") },
+    ...
+}</code></pre>
+    <p>Las entradas con <code>description</code> se añaden al prompt de la IA (salvo las que estén en <code>excluded_sequences_from_ai_prompt</code> en <code>config.json</code>).</p>
+
+    <h2>5. config.json (resumen)</h2>
+    <ul>
+      <li><strong>ai</strong> — <code>instructions</code>, <code>first_model_message</code>, <code>model</code>.</li>
+      <li><strong>finalization_flags</strong> — Lista de banderas que terminan la conversación (ej. <code>["FIN ACEPTA", "FIN RECHAZA"]</code>).</li>
+      <li><strong>robot_name</strong>, <strong>vosk_model_path</strong>.</li>
+      <li><strong>voice</strong> — engine, rutas onnx/voices, voice, language, speed (Kokoro).</li>
+      <li><strong>audio_filter</strong> — pitch_semitones, echo_delay, gain, etc.</li>
+      <li><strong>speech_replacements</strong> — Diccionario de reemplazos para WordReplacerWrapper.</li>
+      <li><strong>idle</strong> — sound_wavs, play_audio_interval (para idle_behaviour).</li>
+      <li><strong>excluded_sequences_from_ai_prompt</strong> — Nombres que no se añaden al prompt (IDLE, FIN ACEPTA, etc.).</li>
+      <li><strong>idle_sequence</strong> — Nombre de la secuencia idle (ej. <code>"IDLE"</code>).</li>
+    </ul>
+
+    <h2>6. main.py — Orden típico</h2>
+    <ol>
+      <li>Configurar logging y <code>BASE_DIR</code>.</li>
+      <li>Cargar <code>config.json</code> y <code>secrets.json</code>.</li>
+      <li>Construir IA (instrucciones + primer mensaje). Añadir al prompt las descripciones de las animaciones (excluyendo las de <code>excluded_sequences_from_ai_prompt</code>).</li>
+      <li>Crear reconocimiento de voz (Vosk o DummyTextRecognition).</li>
+      <li>Crear fábrica de audio y opcionalmente AudioFactoryFilter; crear sintetizador (Kokoro) y opcionalmente WordReplacerWrapper.</li>
+      <li>Crear controladores para cada enum (Servos, Leds, AudioNames...) e inicializarlos con sus enums.</li>
+      <li>Crear <code>DefaultMoveSequencer</code>, <code>DialogueDirector(synthetizer, sequencer, SequenceNameDefinition)</code>, <code>Robot(aiModel, recognition, sequencer, inputA, director, SequenceNameDefinition)</code>.</li>
+      <li>Asignar <code>robotName</code>, <code>initial_dialogue_text</code>, <code>end_dialogue_flags</code>, <code>idle_animation_name</code>, <code>idle_behaviour</code> (función opcional en bucle, p. ej. sonidos cada X segundos).</li>
+      <li>Llamar a <code>main.start()</code>.</li>
+    </ol>
+    <p>Puedes revisar <code>robots/darth_vader/main.py</code> y <code>robots/charro_negro/main.py</code> como referencia completa.</p>
+
+    <h2>7. Qué controlador usar</h2>
+    <p>Según tu hardware: MockController (pruebas), ArduinoSerialController (Arduino), AdafruitServoController (Raspberry + PCA9685), LedController (GPIO), RemoteUDPController (red). Para sonidos en secuencias, AudioPlayerController. Ver <a href="controladores.html">Controladores</a>.</p>
+  </main>
+
+  <footer class="container footer">
+    <a href="index.html">Inicio</a> · AI Talking Robot — Documentación
+  </footer>
+</body>
+</html>

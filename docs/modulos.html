@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulos - AI Talking Robot</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html">Inicio</a>
+      <a href="arquitectura.html">Arquitectura</a>
+      <a href="modulos.html" class="current">Módulos</a>
+      <a href="controladores.html">Controladores</a>
+      <a href="tutorial-robot.html">Tutorial: Crear un robot</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Módulos del proyecto</h1>
+    <p>El código principal está en <code>src/ai_talking_robot</code>. Cada carpeta es un módulo con una responsabilidad clara.</p>
+
+    <h2>integration</h2>
+    <ul>
+      <li><strong>Robot.py</strong> — Clase principal. Recibe IA, reconocimiento, secuenciador, activador de entrada, director de diálogo y diccionario de animaciones. Ejecuta el bucle principal y el conversacional.</li>
+      <li><strong>DialogueDirector.py</strong> — Convierte texto en <code>DialogueObject</code>, sintetiza voz y lanza animaciones en el secuenciador durante la reproducción del diálogo.</li>
+      <li><strong>DialogueObject.py</strong> — Objetos de diálogo: lista de ítems (animación + texto + audio y estado).</li>
+      <li><strong>CustomFormatter.py</strong> — Formato de logging para consola.</li>
+    </ul>
+
+    <h2>sequencer</h2>
+    <ul>
+      <li><strong>ComponentEnum.py</strong> — Enum base que representa un componente (canal, min, max, label opcional). Actúa como puente al controlador: <code>initialize(controller)</code> vincula el enum a un <code>AComponentController</code>; la propiedad <code>currentValue</code> delega en get/set del controlador. Las animaciones trabajan con componentes, no con controladores directamente.</li>
+      <li><strong>DefaultMoveSequencer.py</strong> — Ejecuta secuencias (lista de diccionarios con <code>parameters.time</code> y <code>components</code>). Interpola linealmente en el tiempo y actualiza <code>component.currentValue</code>. Permite cancelar la ejecución con <code>cancelExecution()</code>.</li>
+    </ul>
+
+    <h2>controllers</h2>
+    <p>Controladores de hardware (o simulación). Cada uno recibe un tipo que hereda de <code>ComponentEnum</code> e inicializa sus miembros con <code>component.initialize(self)</code>. Implementan <code>setComponentValue(component, value)</code> y <code>getComponentValue(component)</code>. Ver <a href="controladores.html">Controladores</a> para detalle.</p>
+
+    <h2>speech</h2>
+    <ul>
+      <li><strong>AVoiceSynthetizer</strong> — Clase abstracta. <code>synthetize(text)</code> devuelve un <code>AAudio</code>.</li>
+      <li><strong>KokoroSynthetizer</strong> — Síntesis con Kokoro (modelo ONNX + voces). Configurable: voz, idioma, velocidad.</li>
+      <li><strong>FakeYouVoiceSynthetizer</strong> — Síntesis vía API FakeYou (marcado como deprecado).</li>
+      <li><strong>WordReplacerWrapper</strong> — Envuelve otro sintetizador; aplica un diccionario de reemplazos de palabras antes de sintetizar (útil para pronunciación, p. ej. nombres).</li>
+    </ul>
+
+    <h2>voice</h2>
+    <ul>
+      <li><strong>ASpeechRecognition</strong> — Clase abstracta. <code>startRecognition()</code> devuelve el texto reconocido.</li>
+      <li><strong>VoskSpeechRecognition</strong> — Reconocimiento con modelo Vosk (micrófono, timeout de silencio).</li>
+      <li><strong>DummyTextRecognition</strong> — Pide texto por <code>input()</code> en consola; útil para pruebas sin micrófono.</li>
+    </ul>
+
+    <h2>ai</h2>
+    <ul>
+      <li><strong>AAIModelController</strong> — Clase abstracta. Gestiona conversación y envío de mensajes.</li>
+      <li><strong>GoogleAIModel</strong> — Implementación con API de Google AI (p. ej. Gemma).</li>
+    </ul>
+
+    <h2>audioplayer</h2>
+    <p>Abstracciones para crear y reproducir audio: <code>AAudio</code>, <code>AAudioFactory</code>, <code>SimpleAudio</code>, <code>SimpleAudioFactory</code>, <code>AudioFactoryFilter</code> (pitch, eco, ganancia), y especificaciones como <code>WavFileSpec</code>, <code>WavBytesSpec</code>, <code>NumpyArraySpec</code>.</p>
+
+    <h2>input</h2>
+    <ul>
+      <li><strong>AInputActivator</strong> — Clase abstracta. Define cómo se activa el inicio de la conversación.</li>
+      <li><strong>EnterInputActivator</strong> — Espera pulsar Enter.</li>
+      <li><strong>VoiceRecognitionActivator</strong> — Espera una palabra/frase de voz para activar.</li>
+    </ul>
+  </main>
+
+  <footer class="container footer">
+    <a href="index.html">Inicio</a> · AI Talking Robot — Documentación
+  </footer>
+</body>
+</html>
