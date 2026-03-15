@@ -106,5 +106,4 @@ Este proyecto utiliza las siguientes tecnologías y proyectos de terceros:
 Si utilizas o redistribuyes este proyecto, respeta las licencias y términos de cada uno de estos componentes.
 
 
-Agradezco personalmente a mi profesor y compañeros del Laboratorio Siro. Gracias a su compañía, ayuda y entusiasmo logré aprender muchas cosas y estar en lugares donde nunca
-pensé que estaría. Esto no sería posible sin ellos.
+Agradezco personalmente a mi profesor y compañeros del Laboratorio Siro. Gracias a su compañía, ayuda y entusiasmo logré aprender muchas cosas y estar en lugares donde nunca pensé que estaría. Esto no sería posible sin ellos.
