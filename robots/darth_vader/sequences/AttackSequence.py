@@ -3,7 +3,7 @@ from ..ComponentNameDefinition import *
 AttackSequence = [
   {
         "parameters":{
-            "time" : 1.0,
+            "time" : 0.0,
             "type" : "linear"
         },
         "components":{
@@ -27,7 +27,7 @@ AttackSequence = [
   },
   {
     "parameters" : {
-      "time" : 1.0,
+      "time" : 0.5,
       "type" : "linear",
     },
     "components" : {
