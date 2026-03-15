@@ -1,0 +1,78 @@
+Herramientas
+
+Las herramientas las puedes encontrar encontrar en la carpeta
+tools.
+Estas herramientas están enfocadas en la creación de animaciones y testeo de controladores.
+
+SampleServosDefinition.py
+
+Una implementación de ComponentEnum, de definición de ejemplo de servos, que se puede usar 
+para las herramientas siguientes o para hacer pruebas.
+
+ControllerTester.py
+Una herramienta con interfaz en consola para mover y cambiar los valores de los componentes.
+Útil si quieres comprobar la funcionalidad de un controlador y sus componentes. Los controles 
+se activan con teclado.
+
+python -m tools.ControllerTester
+
+Para configurarlo y decidir qué controlador se va a comprobar se debe cambiar el archivo
+ControllerTesterConfig.py. Este tiene únicamente una función que devuelve los ComponentEnums
+que se usarán, estos deben estar inicializados con algún controlador. Este será el controlador que se debe probar.
+
+VirtualRobotSimulator.py
+Una herramienta que simula un robot con ciertas extremidades y servomotores ya predefinidos.
+(Los mismos de SampleServosDefinition.py). El robot virtual se abre en navegador y se puede mover
+con el mouse. Shift + click para mover, click derecho para rotar y la rueda de ratón para alejar o acercar
+Recibe instrucciones en localhost a través del puerto 5005, por lo que se puede controlar con
+RemoteUDPController.py
+
+python -m tools.VirtualRobotSimulator.py
+
+AnimationCreator.py
+Herramienta parecida a ControllerTester.py pero más robusta y poderosa. Sirve para crear animaciones
+enteras. La línea de tiempo de arriba marca la cantidad de pasos que tendrá la animación, puedes agregar nuevas
+o borrar ya existentes. Puedes reproducir la animación para ver cómo se vería y también guardarla y cargar nuevas.
+Nota: al guardar animaciones, estas no tendrán el import de sus ComponentEnums, por lo que tendrás que añadírselo
+manualmente. Al cargar las animaciones, estas deben ser válidas, es decir, no deben tener errores y sus ComponentEnums
+necesarios deben estar importados en el archivo con import.
+
+python -m tools.AnimationCreator.py
+
+Si se combina con VirtualRobotSimulator.py esto puede ser muy útil para crear animaciones sin necesidad de usar el hardware
+real, aunque de ser posible se recomienda siempre usar el hardware real.
+
+Al igual que ControllerTester, este cuenta con AnimationCreatorConfig.py. Su única función, además de devoler
+los ComponentEnums inicializados con un controlador, también debe devolver un sequencer (En este proyecto el único que hay es
+DefaultMoveSequencer) como primer argumento.
+
+NOTA: Si tu robot es parecido al de VirtualRobotSimulator.py y piensas usar este último para crear animaciones, es posible que quieras calibrar los
+servomotores primero. Dentro de VirtualRobotSimulator.py hay un diccionario "current_angles". En este
+están los defases y dirección de cada servo. Normalmente, si quisieras crear animaciones y usas VirtualRobotSimulator,
+quisieras que las posiciones de cada paso coincida con el robot real. Deberás cambiar el segundo valor de cada componente
+de este diccionario para hacer coincidir las posiciones 0 del robot real y del robot virtual, es decir, por ejemplo 
+que en el AnimationCreator y ControllerTester (Cualquiera de los 2), cuando el componente de un brazo marque su valor en 0,
+el servomotor real del robot cuando esté en 0 coincida con su posición con el robot virtual.
+El tercer valor de cada componente del diccionario, indica la dirección. Puedes cambiar la dirección a 1 o -1 por si tu
+servomotor se mueve en la dirección contraria. Considera también que muchos software para controlar servomotores no admiten
+valores negativos.
+
+
+Dephaser.py
+
+Si tienes animaciones ya existentes, pero cambiaste de hardware o las hiciste con el VirtualRobotSimulator y al ejecutarlas se
+comportan muy diferente, significa que existe un "desfase". Esto pasa cuando los componentes o servomotores no están calibrados
+correctamente, y un valor digamos 0 con un hardware, no corresponde a la misma posición del valor 0 de otro (O del VirtualRobotSimulator).
+Para eso se hizo Dephaser. Este abre una carpeta en donde estén las animaciones, y les aplica un "desfase", indicado por cada Componente.
+Cada "valor de desfase", tienes que calcularlo manualmente, como el ángulo de diferencia que existe entre el valor 0 de tu anterior hardware , y el ángulo 0
+del nuevo (O la diferencia de VirtualRobotSimulator a tu hardware real), tomando como positivo, la dirección a donde se movía tu hardware anterior. (Es decir, la dirección
+a donde se movía si aumentabas el valor del ángulo, esa sería la dirección positiva, caso contrario sería negativa). Además, si el nuevo componente se mueve al lado contrario,
+también tendrás que invertirlo (Dentro de desphaser, este se marca con YES para indicar que será invertido).
+
+python -m tools.Dephaser
+
+Primero solicitará los componentes que usará. Debes indicar la ruta completa del archivo .py en donde se declaren tus ComponentEnums (Como en ComponentNameDefinition.py).
+Luego, de mostrará una interfaz de consola que se controla con las teclas y te dejará ajustar los valores e inversiones de cada componente por separado.
+Finalmente, pedirá abrir una carpeta en donde estén tus animaciones a las que quieres aplicarles el desfase.
+
+NOTA: Esta herramienta hace cambios irreversibles. Si la vas a usar, te recomiendo crear una copia de tus animaciones primero.

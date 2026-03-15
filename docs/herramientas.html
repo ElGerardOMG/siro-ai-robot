@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Herramientas - AI Talking Robot</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html">Inicio</a>
+      <a href="arquitectura.html">Arquitectura</a>
+      <a href="modulos.html">Módulos</a>
+      <a href="controladores.html">Controladores</a>
+      <a href="tutorial-robot.html">Tutorial: Crear un robot</a>
+      <a href="herramientas.html" class="current">Herramientas</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Herramientas</h1>
+    <p>Las herramientas se encuentran en la carpeta <code>tools/</code>. Están enfocadas en la <strong>creación de animaciones</strong> y el <strong>testeo de controladores</strong>.</p>
+
+    <h2>SampleServosDefinition.py</h2>
+    <p>Implementación de ejemplo de <code>ComponentEnum</code> con una definición de servos. Sirve para usar en el resto de herramientas o para hacer pruebas rápidas sin definir tu propio enum.</p>
+
+    <h2>ControllerTester</h2>
+    <p>Herramienta con interfaz en consola para <strong>mover y cambiar los valores de los componentes</strong>. Útil para comprobar que un controlador y sus componentes funcionan correctamente. Los controles se activan con el teclado.</p>
+    <h3>Cómo ejecutarla</h3>
+    <pre class="card"><code>python -m tools.ControllerTester</code></pre>
+    <h3>Configuración</h3>
+    <p>Edita el archivo <code>tools/ControllerTesterConfig.py</code>. Contiene una única función <code>get_config()</code> que debe devolver los <code>ComponentEnum</code> que se usarán. Esos enums deben estar <strong>inicializados con el controlador que quieres probar</strong> (por ejemplo, creas <code>MockController(Servos)</code> o <code>RemoteUDPController(Servos, ...)</code> en esa función y luego devuelves el tipo de enum, p. ej. <code>Servos</code>). El controlador que uses al inicializar los componentes será el que se esté probando.</p>
+    <p>Ejemplo en <code>ControllerTesterConfig.py</code>:</p>
+    <pre class="card"><code>from ai_talking_robot.controllers.MockController import MockController
+from .SampleServosDefinition import Servos
+
+def get_config():
+    MockController(Servos)  # inicializa Servos con MockController
+    return Servos</code></pre>
+
+    <h2>VirtualRobotSimulator</h2>
+    <p>Simulador de un robot con extremidades y servomotores ya predefinidos (los mismos de <code>SampleServosDefinition.py</code>). El robot virtual se abre en el navegador y se puede mover con el ratón:</p>
+    <ul>
+      <li><strong>Shift + clic</strong> — Mover la vista.</li>
+      <li><strong>Clic derecho</strong> — Rotar.</li>
+      <li><strong>Rueda del ratón</strong> — Alejar o acercar.</li>
+    </ul>
+    <p>Recibe instrucciones en <strong>localhost</strong> por el puerto <strong>5005</strong>, por lo que se puede controlar con <code>RemoteUDPController</code> apuntando a <code>127.0.0.1:5005</code>.</p>
+    <h3>Cómo ejecutarla</h3>
+    <pre class="card"><code>python -m tools.VirtualRobotSimulator</code></pre>
+    <p>Si usas <code>AnimationCreator</code> o <code>ControllerTester</code> con <code>RemoteUDPController</code> a ese puerto, el robot virtual reflejará los movimientos.</p>
+
+    <h2>AnimationCreator</h2>
+    <p>Herramienta similar a ControllerTester pero más robusta: sirve para <strong>crear animaciones completas</strong>. Incluye una línea de tiempo con los pasos de la animación: puedes agregar pasos nuevos o borrar existentes, reproducir la animación para previsualizarla, y guardar o cargar animaciones.</p>
+    <h3>Cómo ejecutarla</h3>
+    <pre class="card"><code>python -m tools.AnimationCreator</code></pre>
+    <h3>Configuración</h3>
+    <p>Edita <code>tools/AnimationCreatorConfig.py</code>. La función <code>get_config()</code> debe devolver <strong>dos cosas</strong>: primero un <strong>secuenciador</strong> (por ejemplo <code>DefaultMoveSequencer</code>), y segundo los <strong>ComponentEnum</strong> inicializados con el controlador que quieras usar. Ejemplo con el simulador virtual:</p>
+    <pre class="card"><code>from ai_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
+from ai_talking_robot.controllers.RemoteUDPController import RemoteUDPController
+from .SampleServosDefinition import Servos
+
+def get_config():
+    format = { "servo": "name", "angle": "value" }
+    RemoteUDPController(Servos, format, "127.0.0.1", 5005)
+    sequencer = DefaultMoveSequencer()
+    return sequencer, Servos</code></pre>
+    <h3>Guardar y cargar animaciones</h3>
+    <ul>
+      <li><strong>Al guardar:</strong> El archivo generado no incluirá el <code>import</code> de los ComponentEnum. Tendrás que añadirlo manualmente (p. ej. <code>from ..ComponentNameDefinition import *</code>) cuando copies la animación a tu robot.</li>
+      <li><strong>Al cargar:</strong> El archivo debe ser válido (sin errores de sintaxis) y los ComponentEnum usados en la animación deben estar importados en ese archivo.</li>
+    </ul>
+    <p>Combinar <code>VirtualRobotSimulator</code> con <code>AnimationCreator</code> (usando <code>RemoteUDPController</code> al puerto 5005) permite crear animaciones sin hardware real. Siempre que sea posible se recomienda validar después con el hardware real.</p>
+
+    <h2>Calibración del VirtualRobotSimulator</h2>
+    <p>Si tu robot real es parecido al del simulador y quieres que las posiciones coincidan, conviene calibrar. Dentro de <code>VirtualRobotSimulator.py</code> hay un diccionario <code>current_angles</code>:</p>
+    <ul>
+      <li>El <strong>segundo valor</strong> de cada componente es el desfase: ajústalo para que la posición “0” del robot virtual coincida con la posición “0” del robot real (por ejemplo, cuando en ControllerTester o AnimationCreator un brazo marque 0, que el servo real en 0 se vea igual que en el simulador).</li>
+      <li>El <strong>tercer valor</strong> indica la dirección (<code>1</code> o <code>-1</code>). Cámbialo a <code>-1</code> si tu servo se mueve al revés. Ten en cuenta que muchos controladores no admiten valores negativos.</li>
+    </ul>
+
+    <h2>Dephaser</h2>
+    <p>Cuando tienes animaciones hechas con un hardware (o con el VirtualRobotSimulator) y al usarlas en otro hardware se comportan distinto, suele haber un <strong>desfase</strong>: el “0” de un sistema no corresponde al mismo ángulo físico que el “0” del otro. <strong>Dephaser</strong> abre una carpeta con archivos de animación y les aplica un desfase e inversión por componente.</p>
+    <h3>Cómo ejecutarla</h3>
+    <pre class="card"><code>python -m tools.Dephaser</code></pre>
+    <h3>Uso</h3>
+    <ol>
+      <li><strong>Componentes:</strong> Al iniciar, pide la ruta completa del archivo .py donde están declarados tus ComponentEnum (por ejemplo el <code>ComponentNameDefinition.py</code> de tu robot).</li>
+      <li><strong>Ajuste:</strong> Se muestra una interfaz en consola controlada por teclado para ajustar los valores de desfase y la inversión (YES/NO) de cada componente por separado. El desfase es la diferencia de ángulo entre el “0” del hardware anterior y el “0” del nuevo, tomando como positiva la dirección en que aumentaba el valor en el hardware anterior. Marca YES para invertir si el nuevo componente se mueve al lado contrario.</li>
+      <li><strong>Carpeta:</strong> Al final pide la carpeta donde están las animaciones (.py) a las que quieres aplicar el desfase. Dephaser modifica esos archivos.</li>
+    </ol>
+    <p><strong>Importante:</strong> Dephaser hace cambios irreversibles en los archivos. Se recomienda hacer una copia de las animaciones antes de usarlo.</p>
+  </main>
+
+  <footer class="container footer">
+    <a href="index.html">Inicio</a> · Siro AI Robot — Documentación
+  </footer>
+</body>
+</html>
