@@ -30,10 +30,115 @@
       <li><code>SequenceNameDefinition.py</code> — Diccionario nombre → { description, sequence } para animaciones.</li>
       <li><code>sequences/</code> — Módulos Python que definen listas de movimientos (una lista por animación).</li>
       <li><code>audios/</code> — Archivos WAV para idle y secuencias (opcional).</li>
-      <li><code>main.py</code> — Punto de entrada: carga config, instancia IA, reconocimiento, sintetizador, controladores, secuenciador, director y Robot; asigna parámetros y llama a <code>main.start()</code>.</li>
+      <li><code>main.py</code> — Punto de entrada: carga config, instancia todos los módulos, asigna parámetros y llama a <code>main.start()</code>.</li>
     </ul>
 
-    <h2>2. Definir componentes (ComponentNameDefinition.py)</h2>
+    <h2>2. config.json — Significado de cada campo</h2>
+    <p>La siguiente tabla describe los campos del <code>config.json</code> usando como referencia el de <code>robots/darth_vader/config.json</code>.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Significado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ai.instructions</code></td>
+          <td>Texto de instrucciones del sistema para la IA: personalidad, reglas de la conversación y formato de respuesta (p. ej. una bandera por frase). Al final se concatenan automáticamente las descripciones de las animaciones disponibles (salvo las excluidas).</td>
+        </tr>
+        <tr>
+          <td><code>ai.first_model_message</code></td>
+          <td>Primer mensaje que dirá el robot al iniciar la conversación. Debe incluir banderas de animación si quieres gestos (ej. <code>[ADEMAN_1] Soy Darth Vader...</code>).</td>
+        </tr>
+        <tr>
+          <td><code>ai.model</code></td>
+          <td>Nombre del modelo de IA (p. ej. <code>gemma-3-27b-it</code> para Google AI).</td>
+        </tr>
+        <tr>
+          <td><code>finalization_flags</code></td>
+          <td>Lista de cadenas. Si alguna aparece en la respuesta de la IA, se termina el bucle conversacional (ej. <code>["FIN ACEPTA", "FIN ATACA", "FIN"]</code>).</td>
+        </tr>
+        <tr>
+          <td><code>robot_name</code></td>
+          <td>Nombre del robot (logs y mensajes).</td>
+        </tr>
+        <tr>
+          <td><code>vosk_model_path</code></td>
+          <td>Ruta al directorio del modelo Vosk para reconocimiento de voz (se usa si instancias <code>VoskSpeechRecognition</code>).</td>
+        </tr>
+        <tr>
+          <td><code>audio_filter.pitch_semitones</code></td>
+          <td>Desplazamiento de tono en semitonos aplicado al audio de voz (negativo = más grave).</td>
+        </tr>
+        <tr>
+          <td><code>audio_filter.echo_delay</code></td>
+          <td>Retardo del eco en segundos (ej. 0.008).</td>
+        </tr>
+        <tr>
+          <td><code>audio_filter.echo_decay</code></td>
+          <td>Decaimiento del eco (0–1).</td>
+        </tr>
+        <tr>
+          <td><code>audio_filter.overlay_delay</code></td>
+          <td>Retardo de superposición (mezcla).</td>
+        </tr>
+        <tr>
+          <td><code>audio_filter.gain</code></td>
+          <td>Ganancia del audio (volumen, ej. 0.5 o 1.0).</td>
+        </tr>
+        <tr>
+          <td><code>voice.engine</code></td>
+          <td>Identificador del motor de voz (ej. <code>"kokoro"</code>).</td>
+        </tr>
+        <tr>
+          <td><code>voice.onnx_file_path</code></td>
+          <td>Ruta al archivo ONNX del modelo Kokoro.</td>
+        </tr>
+        <tr>
+          <td><code>voice.voices_file_path</code></td>
+          <td>Ruta al archivo de voces (.bin) de Kokoro.</td>
+        </tr>
+        <tr>
+          <td><code>voice.voice</code></td>
+          <td>Nombre de la voz (ej. <code>pm_alex</code>).</td>
+        </tr>
+        <tr>
+          <td><code>voice.language</code></td>
+          <td>Código de idioma (ej. <code>es</code>).</td>
+        </tr>
+        <tr>
+          <td><code>voice.speed</code></td>
+          <td>Velocidad de habla (1.0 = normal).</td>
+        </tr>
+        <tr>
+          <td><code>speech_replacements</code></td>
+          <td>Diccionario palabra → reemplazo para el sintetizador (pronunciación). Se usa con <code>WordReplacerWrapper</code> (ej. <code>"Darth": "Dart"</code>).</td>
+        </tr>
+        <tr>
+          <td><code>idle.sound_wavs</code></td>
+          <td>Lista de rutas relativas a la carpeta del robot (ej. <code>["/audios/breathing.wav"]</code>) para sonidos que se reproducen en bucle durante el idle (según <code>idle_behaviour</code> en main.py).</td>
+        </tr>
+        <tr>
+          <td><code>idle.play_audio_interval</code></td>
+          <td>Intervalo en segundos entre reproducciones de un sonido aleatorio del idle (ej. 3.0).</td>
+        </tr>
+        <tr>
+          <td><code>sequence_audios</code></td>
+          <td>Rutas de WAV usados en secuencias (referencia; en Darth Vader los audios se cargan desde <code>ComponentNameDefinition.AudioNames</code> con <code>createAudios</code>).</td>
+        </tr>
+        <tr>
+          <td><code>excluded_sequences_from_ai_prompt</code></td>
+          <td>Nombres de animaciones que no se añaden al prompt de la IA (ej. IDLE, FIN ACEPTA), para que la IA no las elija como gestos normales.</td>
+        </tr>
+        <tr>
+          <td><code>idle_sequence</code></td>
+          <td>Nombre de la secuencia que se ejecuta cuando el robot está en espera (ej. <code>"IDLE"</code>). Debe existir en <code>SequenceNameDefinition</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Definir componentes (ComponentNameDefinition.py)</h2>
     <p>Cada enum representa un conjunto de componentes manejados por un mismo controlador. Sintaxis por miembro:</p>
     <ul>
       <li>Servos/LEDs: <code>NOMBRE = (channel, min_value, max_value)</code></li>
@@ -53,7 +158,7 @@ class AudioNames(ComponentEnum):
     SABER_ON = (0, 0, 1, f"{BASE_DIR}/audios/saber_on.wav")
     ...</code></pre>
 
-    <h2>3. Definir secuencias (sequences/)</h2>
+    <h2>4. Definir secuencias (sequences/)</h2>
     <p>Cada archivo en <code>sequences/</code> (excepto <code>__init__.py</code>) puede exportar listas. El <code>__init__.py</code> descubre los módulos y rellena el diccionario <code>SEQUENCES</code> (nombre de la variable → lista).</p>
     <p>Cada secuencia es una lista de pasos. Cada paso es un dict:</p>
     <ul>
@@ -71,12 +176,10 @@ Ademan_1 = [
       ...
     },
   },
-  { "parameters": { "time": 0.7, "type": "linear" },
-    "components": { ... },
-  },
+  ...
 ]</code></pre>
 
-    <h2>4. SequenceNameDefinition.py</h2>
+    <h2>5. SequenceNameDefinition.py</h2>
     <p>Asocia un nombre (el que la IA usará en las banderas) con descripción (para el prompt) y la secuencia (desde <code>SEQUENCES</code>):</p>
     <pre class="card"><code>from .sequences import SEQUENCES
 
@@ -89,37 +192,142 @@ SequenceNameDefinition = {
     "FIN ACEPTA": { "description": "Animación de término cuando acepta", "sequence": SEQUENCES.get("SoundEffect") },
     ...
 }</code></pre>
-    <p>Las entradas con <code>description</code> se añaden al prompt de la IA (salvo las que estén en <code>excluded_sequences_from_ai_prompt</code> en <code>config.json</code>).</p>
 
-    <h2>5. config.json (resumen)</h2>
-    <ul>
-      <li><strong>ai</strong> — <code>instructions</code>, <code>first_model_message</code>, <code>model</code>.</li>
-      <li><strong>finalization_flags</strong> — Lista de banderas que terminan la conversación (ej. <code>["FIN ACEPTA", "FIN RECHAZA"]</code>).</li>
-      <li><strong>robot_name</strong>, <strong>vosk_model_path</strong>.</li>
-      <li><strong>voice</strong> — engine, rutas onnx/voices, voice, language, speed (Kokoro).</li>
-      <li><strong>audio_filter</strong> — pitch_semitones, echo_delay, gain, etc.</li>
-      <li><strong>speech_replacements</strong> — Diccionario de reemplazos para WordReplacerWrapper.</li>
-      <li><strong>idle</strong> — sound_wavs, play_audio_interval (para idle_behaviour).</li>
-      <li><strong>excluded_sequences_from_ai_prompt</strong> — Nombres que no se añaden al prompt (IDLE, FIN ACEPTA, etc.).</li>
-      <li><strong>idle_sequence</strong> — Nombre de la secuencia idle (ej. <code>"IDLE"</code>).</li>
-    </ul>
+    <h2>6. main.py — Cómo inicializar e instanciar cada módulo</h2>
+    <p>Orden típico con fragmentos de código concretos (basados en <code>robots/darth_vader/main.py</code>).</p>
 
-    <h2>6. main.py — Orden típico</h2>
-    <ol>
-      <li>Configurar logging y <code>BASE_DIR</code>.</li>
-      <li>Cargar <code>config.json</code> y <code>secrets.json</code>.</li>
-      <li>Construir IA (instrucciones + primer mensaje). Añadir al prompt las descripciones de las animaciones (excluyendo las de <code>excluded_sequences_from_ai_prompt</code>).</li>
-      <li>Crear reconocimiento de voz (Vosk o DummyTextRecognition).</li>
-      <li>Crear fábrica de audio y opcionalmente AudioFactoryFilter; crear sintetizador (Kokoro) y opcionalmente WordReplacerWrapper.</li>
-      <li>Crear controladores para cada enum (Servos, Leds, AudioNames...) e inicializarlos con sus enums.</li>
-      <li>Crear <code>DefaultMoveSequencer</code>, <code>DialogueDirector(synthetizer, sequencer, SequenceNameDefinition)</code>, <code>Robot(aiModel, recognition, sequencer, inputA, director, SequenceNameDefinition)</code>.</li>
-      <li>Asignar <code>robotName</code>, <code>initial_dialogue_text</code>, <code>end_dialogue_flags</code>, <code>idle_animation_name</code>, <code>idle_behaviour</code> (función opcional en bucle, p. ej. sonidos cada X segundos).</li>
-      <li>Llamar a <code>main.start()</code>.</li>
-    </ol>
-    <p>Puedes revisar <code>robots/darth_vader/main.py</code> y <code>robots/charro_negro/main.py</code> como referencia completa.</p>
+    <h3>6.1 Base y configuración</h3>
+    <pre class="card"><code>from pathlib import Path
+import json
+
+BASE_DIR = Path(__file__).resolve().parent
+
+with open(f'{BASE_DIR}/config.json', 'r', encoding='utf-8') as f:
+    config = json.load(f)
+with open(f'{BASE_DIR}/secrets.json', 'r') as f:
+    secrets = json.load(f)</code></pre>
+
+    <h3>6.2 IA</h3>
+    <p>Crear el modelo, leer instrucciones y primer mensaje, añadir al prompt las descripciones de las animaciones (excluyendo las de <code>excluded_sequences_from_ai_prompt</code>), y fijar el mensaje inicial.</p>
+    <pre class="card"><code>from ai_talking_robot.ai.GoogleAIModel import GoogleAIModel
+from .SequenceNameDefinition import SequenceNameDefinition
+
+_ai_model_name = config['ai'].get('model')
+ai = GoogleAIModel(apiKey=secrets["google_api_key"], model=_ai_model_name)
+
+_ai_instructions = config['ai']['instructions']
+_ai_firstMessage = config['ai']['first_model_message']
+
+_excluded_sequences = config.get('excluded_sequences_from_ai_prompt', [])
+for name, d in SequenceNameDefinition.items():
+    if d.get("description") is not None and name not in _excluded_sequences:
+        _ai_instructions += f"[{name}]: {d['description']}\n"
+
+ai.addMessage(_ai_instructions, _ai_firstMessage)</code></pre>
+
+    <h3>6.3 Reconocimiento de voz</h3>
+    <pre class="card"><code>from ai_talking_robot.voice.DummyTextRecognition import DummyTextRecognition
+from ai_talking_robot.voice.VoskSpeechRecognition import VoskSpeechRecognition
+
+# Pruebas sin micrófono:
+recognition = DummyTextRecognition()
+# Con micrófono (Vosk):
+# recognition = VoskSpeechRecognition(model=config.get('vosk_model_path', 'resources/models/vosk-model-es-0.42'))</code></pre>
+
+    <h3>6.4 Fábrica de audio y filtro</h3>
+    <pre class="card"><code>from ai_talking_robot.audioplayer.SimpleAudioFactory import SimpleAudioFactory
+from ai_talking_robot.audioplayer.AudioFactoryFilter import AudioFactoryFilter
+
+audioFactory = SimpleAudioFactory()
+audioFilter = AudioFactoryFilter(audioFactory)
+
+_audio_filter_config = config.get('audio_filter', {})
+audioFilter.pitch_semitones = _audio_filter_config.get('pitch_semitones', -4)
+audioFilter.echo_delay = _audio_filter_config.get('echo_delay', 0.008)
+audioFilter.echo_decay = _audio_filter_config.get('echo_decay', 0.6)
+audioFilter.overlay_delay = _audio_filter_config.get('overlay_delay', 0.01)
+audioFilter.gain = _audio_filter_config.get('gain', 1.0)</code></pre>
+
+    <h3>6.5 Sintetizador de voz</h3>
+    <pre class="card"><code>from ai_talking_robot.speech.KokoroSynthetizer import KokoroSynthetizer
+from ai_talking_robot.speech.WordReplacerWrapper import WordReplacerWrapper
+
+_voice_config = config.get('voice', {})
+synth = KokoroSynthetizer(
+    audioFilter,
+    onnxFilePath=_voice_config.get('onnx_file_path', 'resources/models/kokoro/kokoro-v1.0.onnx'),
+    voicesBinPath=_voice_config.get('voices_file_path', 'resources/models/kokoro/voices-v1.0.bin')
+)
+synth.setConfig(
+    voice=_voice_config.get('voice', 'pm_alex'),
+    language=_voice_config.get('language', 'es'),
+    speed=_voice_config.get('speed', 1.0)
+)
+synth = WordReplacerWrapper(synth, config.get('speech_replacements', {}))</code></pre>
+
+    <h3>6.6 Activador de entrada y controladores</h3>
+    <pre class="card"><code>from ai_talking_robot.input.EnterInputActivator import EnterInputActivator
+from ai_talking_robot.controllers.MockController import MockController
+from ai_talking_robot.controllers.RemoteUDPController import RemoteUDPController
+from ai_talking_robot.controllers.AudioPlayerController import AudioPlayerController
+from ai_talking_robot.audioplayer.AudioSpec import WavFileSpec
+from .ComponentNameDefinition import Servos, Leds, AudioNames
+
+input_activator = EnterInputActivator()
+
+udp_format = { "servo": "name", "angle": "value" }
+servoController = RemoteUDPController(Servos, udp_format, "127.0.0.1", 5005)
+# servoController = MockController(Servos, "Servos")  # alternativa sin hardware
+
+ledController = MockController(Leds, "Leds")
+
+audioController = AudioPlayerController(AudioNames, None)
+audioController.createAudios(audioFactory, WavFileSpec(""))</code></pre>
+
+    <h3>6.7 Secuenciador y director de diálogo</h3>
+    <pre class="card"><code>from ai_talking_robot.sequencer.DefaultMoveSequencer import DefaultMoveSequencer
+from ai_talking_robot.integration.DialogueDirector import DialogueDirector
+
+sequencer = DefaultMoveSequencer()
+director = DialogueDirector(synth, sequencer, SequenceNameDefinition)</code></pre>
+
+    <h3>6.8 Robot y configuración final</h3>
+    <pre class="card"><code>from ai_talking_robot.integration.Robot import Robot, Status
+import random
+import time
+
+main = Robot(
+    aiModel=ai,
+    recognition=recognition,
+    sequencer=sequencer,
+    inputA=input_activator,
+    director=director,
+    animations=SequenceNameDefinition
+)
+
+main.robotName = config.get('robot_name', 'Robot')
+main.initial_dialogue_text = _ai_firstMessage
+main.end_dialogue_flags = config.get('finalization_flags')
+main.idle_animation_name = config.get("idle_sequence")
+
+# Comportamiento idle opcional: sonidos en bucle
+_idle_cfg = config.get('idle', {})
+_audio_wavs = _idle_cfg.get('sound_wavs', [])
+_audios = [audioFactory.create(WavFileSpec(path=f'{BASE_DIR}{p}')) for p in _audio_wavs]
+_play_audio_interval = _idle_cfg.get('play_audio_interval', 6.0)
+
+def sound_loop():
+    while True:
+        if main.status in [Status.LISTENING, Status.THINKING, Status.WAITING]:
+            if _audios:
+                _audios[random.randint(0, len(_audios) - 1)].playAudio()
+        time.sleep(_play_audio_interval)
+
+main.idle_behaviour = sound_loop
+main.start()</code></pre>
 
     <h2>7. Qué controlador usar</h2>
-    <p>Según tu hardware: MockController (pruebas), ArduinoSerialController (Arduino), AdafruitServoController (Raspberry + PCA9685), LedController (GPIO), RemoteUDPController (red). Para sonidos en secuencias, AudioPlayerController. Ver <a href="controladores.html">Controladores</a>.</p>
+    <p>Según tu hardware: MockController (pruebas), ArduinoSerialController (Arduino), AdafruitServoController (Raspberry + PCA9685), LedController (GPIO), RemoteUDPController (red). Para sonidos en secuencias, AudioPlayerController. Ver <a href="controladores.html">Controladores</a> para instanciar cada uno.</p>
   </main>
 
   <footer class="container footer">
