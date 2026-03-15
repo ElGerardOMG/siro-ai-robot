@@ -19,8 +19,8 @@ if TYPE_CHECKING:
     único controlador.
     Está hecho para facilitar la creación de animaciones (Secuencias de Components) y que el 
     Sequencer no tenga que estar constantemente averiguando a qué componente pertenece cada controlador,
-    sino que el propio componente sepa a qué controlador pertenece, así como evitar ligar cada
-    componente a un único controlador.
+    sino que el propio componente sepa a qué controlador pertenece, así como evitar hardcodear esta
+    petenencia y así hacerla más dinámica.
 """
 class ComponentEnum(Enum):
     #Syntaxis:
